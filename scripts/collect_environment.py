@@ -34,7 +34,6 @@ def main() -> None:
         "hostname": platform.node(),
         "platform": platform.platform(),
         "python": sys.version,
-        "python_executable": sys.executable,
         "torch": torch.__version__,
         "torch_cuda": torch.version.cuda,
         "cuda_available": torch.cuda.is_available(),
