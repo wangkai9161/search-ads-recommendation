@@ -1,0 +1,18 @@
+{
+  "model": "fm",
+  "task": "cvr",
+  "target": "Sale",
+  "run_name": "sponsored-search-tune-fm-e8-lr0p001-s42",
+  "data_path": "./data/criteo-sponsored-search/data.tsv",
+  "epochs": 2,
+  "batch_size": 8192,
+  "max_rows": 200000,
+  "stats_rows": 100000,
+  "num_sparse_bins": 100000,
+  "embedding_dim": 8,
+  "learning_rate": 0.001,
+  "val_fraction": 0.2,
+  "seed": 42,
+  "device": "cpu",
+  "resolved_device": "cpu"
+}

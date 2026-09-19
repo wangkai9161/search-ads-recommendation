@@ -1,0 +1,23 @@
+{
+  "model": "lr",
+  "task": "cvr",
+  "target": "Sale",
+  "run_name": "sponsored-search-tune-lr-e8-lr0p001-s42-fno_history",
+  "data_path": "./data/criteo-sponsored-search/data.tsv",
+  "epochs": 1,
+  "batch_size": 65536,
+  "max_rows": 10000,
+  "stats_rows": 5000,
+  "num_sparse_bins": 100000,
+  "embedding_dim": 8,
+  "learning_rate": 0.001,
+  "val_fraction": 0.15,
+  "train_fraction": 0.7,
+  "split_mode": "time",
+  "feature_set": "no_history",
+  "early_stopping_patience": 2,
+  "early_stopping_min_delta": 1e-05,
+  "seed": 42,
+  "device": "cpu",
+  "resolved_device": "cpu"
+}

@@ -1,0 +1,5 @@
+Best Valid AUC: 0.803771
+Best Epoch    : 9
+Test Loss     : 0.539043
+Test AUC      : 0.804268
+Test LogLoss  : 0.539043

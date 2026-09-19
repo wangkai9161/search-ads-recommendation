@@ -1,0 +1,17 @@
+{
+  "epoch": 2,
+  "train_loss": 0.04573820967441688,
+  "val_loss": 0.04028963191384075,
+  "val_logloss": 0.04028963564586117,
+  "val_auc": 0.9959804111476923,
+  "val_pr_auc": 0.9805240718060371,
+  "val_brier": 0.01096814784514467,
+  "val_ece": 0.005581440997967569,
+  "val_positive_rate": 0.10850071907043457,
+  "run_name": "full-gpu-deepfm-e2",
+  "model": "deepfm",
+  "task": "cvr",
+  "target": "Sale",
+  "elapsed_seconds": 659.7849192768335,
+  "checkpoint": "./result/full-gpu-deepfm-e2/checkpoints/model_final.pth"
+}

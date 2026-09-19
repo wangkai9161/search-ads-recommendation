@@ -1,0 +1,21 @@
+{
+    "max_history_len": 20,
+    "positive_history_only": true,
+    "min_history_len": 1,
+    "embed_dim": 16,
+    "att_hidden_dims": [
+        32,
+        16
+    ],
+    "mlp_hidden_dims": [
+        64,
+        32
+    ],
+    "dropout": 0.4,
+    "num_epochs": 30,
+    "lr": 0.001,
+    "weight_decay": 1e-05,
+    "patience": 3,
+    "train_batch_size": 1024,
+    "eval_batch_size": 2048
+}

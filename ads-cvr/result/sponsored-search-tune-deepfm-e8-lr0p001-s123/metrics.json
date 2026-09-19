@@ -1,0 +1,17 @@
+{
+  "epoch": 1,
+  "train_loss": 0.6596830861523747,
+  "val_loss": 0.6211438097178936,
+  "val_logloss": 0.6200638954941134,
+  "val_auc": 0.32423970527938845,
+  "val_pr_auc": 0.07497994969018434,
+  "val_brier": 0.20702857574582212,
+  "val_ece": 0.30795212408296907,
+  "val_positive_rate": 0.10935000330209732,
+  "run_name": "sponsored-search-tune-deepfm-e8-lr0p001-s123",
+  "model": "deepfm",
+  "task": "cvr",
+  "target": "Sale",
+  "elapsed_seconds": 9.649999568238854,
+  "checkpoint": "./result/sponsored-search-tune-deepfm-e8-lr0p001-s123/checkpoints/model_final.pth"
+}

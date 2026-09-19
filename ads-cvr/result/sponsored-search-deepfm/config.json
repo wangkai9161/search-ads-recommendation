@@ -1,0 +1,18 @@
+{
+  "model": "deepfm",
+  "task": "cvr",
+  "target": "Sale",
+  "data_path": "data/criteo-sponsored-search/data.tsv",
+  "epochs": 1,
+  "batch_size": 512,
+  "max_rows": 5000,
+  "stats_rows": 1000,
+  "num_sparse_bins": 100000,
+  "embedding_dim": 8,
+  "learning_rate": 0.001,
+  "val_fraction": 0.2,
+  "seed": 42,
+  "device": "cpu",
+  "run_name": "sponsored-search-deepfm",
+  "resolved_device": "cpu"
+}

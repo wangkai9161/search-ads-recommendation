@@ -1,0 +1,265 @@
+{
+  "input": "data/criteo-sponsored-search/data.tsv",
+  "rows": 15995634,
+  "cols": 23,
+  "label_positive": 1732721,
+  "label_negative": 14262913,
+  "label_positive_rate": 0.10832462158111394,
+  "click_timestamp_sorted": false,
+  "numeric": {
+    "Sale": {
+      "count": 15995634,
+      "mean": 0.10832462158111394,
+      "std": 0.3107899579143805,
+      "min": 0.0,
+      "max": 1.0
+    },
+    "SalesAmountInEuro": {
+      "count": 1732721,
+      "mean": 114.85933223767128,
+      "std": 291.94463836315686,
+      "min": 0.0,
+      "max": 62458.773399999984
+    },
+    "time_delay_for_conversion": {
+      "count": 1727341,
+      "mean": 319550.3108986587,
+      "std": 586781.8548238635,
+      "min": 0.0,
+      "max": 2589818.0
+    },
+    "click_timestamp": {
+      "count": 15995634,
+      "mean": 1600550400.660867,
+      "std": 2268118.22783205,
+      "min": 1596439471.0,
+      "max": 1604301870.0
+    },
+    "nb_clicks_1week": {
+      "count": 9251207,
+      "mean": 390.3994433375018,
+      "std": 1342.4726594253545,
+      "min": 0.0,
+      "max": 25390.0
+    },
+    "product_price": {
+      "count": 15995634,
+      "mean": 10.761980992994088,
+      "std": 112.96756644917826,
+      "min": 0.0,
+      "max": 76161.01
+    }
+  },
+  "positive_revenue": {
+    "count": 1732721,
+    "mean": 114.85933223767128,
+    "std": 291.94463836315686,
+    "min": 0.0,
+    "max": 62458.773399999984
+  },
+  "positive_delay": {
+    "count": 1727341,
+    "mean": 319550.3108986587,
+    "std": 586781.8548238635,
+    "min": 0.0,
+    "max": 2589818.0
+  },
+  "missing_counts": {
+    "Sale": 0,
+    "SalesAmountInEuro": 14262913,
+    "time_delay_for_conversion": 14268293,
+    "click_timestamp": 0,
+    "nb_clicks_1week": 6744427,
+    "product_price": 0,
+    "product_age_group": 11760058,
+    "device_type": 3032,
+    "product_gender": 11654195,
+    "product_country": 3834802,
+    "product_brand": 7241560,
+    "product_category_1": 6142756,
+    "product_category_2": 6151249,
+    "product_category_3": 7342676,
+    "product_category_4": 10494308,
+    "product_category_5": 14595054,
+    "product_category_6": 15717150,
+    "product_category_7": 15995414,
+    "partner_id": 0,
+    "product_id": 3828338,
+    "user_id": 0,
+    "product_title": 6208174
+  },
+  "low_card_top": {
+    "product_age_group": [
+      [
+        "4C90FD52FC53D2C1C205844CB69575AB",
+        3261727
+      ],
+      [
+        "88460293E9517D21E39AA889BD5AADC8",
+        489188
+      ],
+      [
+        "921B36149E5B081FD24450BFE2CE4430",
+        303645
+      ],
+      [
+        "0CD76C7030D0900BE250C8D41703D180",
+        74273
+      ],
+      [
+        "538912C31E773613AB51FBAE58492476",
+        47131
+      ],
+      [
+        "A443B40A19DB45968C2825CE225368DF",
+        20722
+      ],
+      [
+        "E7BD5A29457B8E92582951B586319A9C",
+        16879
+      ],
+      [
+        "F716A9DB9D084CD5CFBDA30A923016E1",
+        12933
+      ],
+      [
+        "D72D7E92251E4C54C786FDEFFA4DEF5A",
+        4689
+      ],
+      [
+        "3FEC071EF6B3D061D8804E0522FF4D2A",
+        4387
+      ]
+    ],
+    "device_type": [
+      [
+        "7E56C27BFF0305E788DA55A029EC4988",
+        8826495
+      ],
+      [
+        "D7D1FB49049702BF6338894757E0D959",
+        5925809
+      ],
+      [
+        "FF2C446555E3822B0E0FC3406116E86D",
+        1237228
+      ],
+      [
+        "B432A885981287B47E08B41E802860B2",
+        2256
+      ],
+      [
+        "0C297EB7365042A7DCB803298164359F",
+        805
+      ],
+      [
+        "1D2373C2A02F5A307C1F0C697ECF8429",
+        5
+      ],
+      [
+        "C1ED32BB62670069B0ACE459169A7EAA",
+        3
+      ],
+      [
+        "D5AF1EAB7526F8539A66F715079AB628",
+        1
+      ]
+    ],
+    "product_gender": [
+      [
+        "A5D15FC386510762EC0DDFF54ABE6F94",
+        2166387
+      ],
+      [
+        "1B491180398E2F0390E6A588B3BCE291",
+        1376737
+      ],
+      [
+        "C45A9AC6D102ACAEEDF0D6F78636D84A",
+        661363
+      ],
+      [
+        "D7B42B0C4D807EF1C13F79948743E9DA",
+        77671
+      ],
+      [
+        "6EFABCEDA36A931DBF760F88970BAF0E",
+        19723
+      ],
+      [
+        "86E2AFBF909EC95B069893FF0BBC5B26",
+        12356
+      ],
+      [
+        "C83584C67375245584CEBF5DCE5BEE2D",
+        10901
+      ],
+      [
+        "26FE89E9DD2E6FC18AA5BE1F6D5A6870",
+        8301
+      ],
+      [
+        "28F311FA00BD3B4D076659D87EE3AE8D",
+        2481
+      ],
+      [
+        "3B3F1EFC68D245B766D311E45CD6B955",
+        2194
+      ]
+    ],
+    "product_country": [
+      [
+        "57A1D462A03BD076E029CF9310C11FC5",
+        4041146
+      ],
+      [
+        "989EEF92F2A525DD896557425EA7C4C7",
+        3435304
+      ],
+      [
+        "2AC62132FBCFA093B9426894A4BC6278",
+        2544011
+      ],
+      [
+        "D963E3BCE149E71F5D5E3000DCF68A9F",
+        1171413
+      ],
+      [
+        "F47588BE654E207435633B072A9D69BC",
+        580289
+      ],
+      [
+        "B1D897877EBD2BCE4A722DF0581CDAF5",
+        233542
+      ],
+      [
+        "B74153C05E08C5657699F356BFDB2D85",
+        48688
+      ],
+      [
+        "F0C08A161AA0404193A7EF78F5C3E06C",
+        32649
+      ],
+      [
+        "2D272B47B9F6C9A9690C783C6ACA8E8D",
+        28102
+      ],
+      [
+        "706D09EEA6B6EA9A3DD3EAE236428B6B",
+        14293
+      ]
+    ]
+  },
+  "title_length_counts": {
+    "1": 546973,
+    "2": 1448547,
+    "3": 2005872,
+    "4": 2145819,
+    "5": 1639627,
+    "6": 1042609,
+    "7": 541204,
+    "8": 228287,
+    "9": 106829,
+    "10": 81693
+  }
+}

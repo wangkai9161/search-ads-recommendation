@@ -1,0 +1,18 @@
+{
+  "model": "deepfm",
+  "task": "cvr",
+  "target": "Sale",
+  "run_name": "full-gpu-deepfm-e2",
+  "data_path": "./data/criteo-sponsored-search/data.tsv",
+  "epochs": 2,
+  "batch_size": 65536,
+  "max_rows": null,
+  "stats_rows": 1000000,
+  "num_sparse_bins": 100000,
+  "embedding_dim": 16,
+  "learning_rate": 0.001,
+  "val_fraction": 0.2,
+  "seed": 42,
+  "device": "auto",
+  "resolved_device": "cuda"
+}

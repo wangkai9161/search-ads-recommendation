@@ -1,0 +1,27 @@
+{
+  "model": "deepfm",
+  "task": "cvr",
+  "target": "Sale",
+  "run_name": "sponsored-search-tune-deepfm-e16-lr0p001-s123-fno_time",
+  "data_path": "./data/criteo-sponsored-search/data.tsv",
+  "epochs": 8,
+  "batch_size": 65536,
+  "max_rows": 200000,
+  "stats_rows": null,
+  "num_sparse_bins": 100000,
+  "embedding_dim": 16,
+  "learning_rate": 0.001,
+  "val_fraction": 0.15,
+  "train_fraction": 0.7,
+  "split_mode": "time",
+  "feature_set": "no_time",
+  "early_stopping_patience": 3,
+  "early_stopping_min_delta": 1e-05,
+  "seed": 123,
+  "device": "cuda",
+  "resolved_device": "cuda",
+  "time_split_boundaries": {
+    "train_end": 1603145205.0,
+    "valid_end": 1603503667.4
+  }
+}

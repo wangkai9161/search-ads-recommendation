@@ -1,0 +1,29 @@
+{
+  "model": "deepfm",
+  "task": "cvr",
+  "target": "Sale",
+  "run_name": "sponsored-search-tune-deepfm-e16-lr0p001-s42-fno_time-rfull-cache-8ep-gpu2",
+  "run_tag": "full-cache-8ep-gpu2",
+  "data_path": "./data/criteo-sponsored-search/data.tsv",
+  "cache_dir": "./cache/criteo-full",
+  "epochs": 8,
+  "batch_size": 65536,
+  "max_rows": null,
+  "stats_rows": null,
+  "num_sparse_bins": 100000,
+  "embedding_dim": 16,
+  "learning_rate": 0.001,
+  "val_fraction": 0.15,
+  "train_fraction": 0.7,
+  "split_mode": "time",
+  "feature_set": "no_time",
+  "early_stopping_patience": 3,
+  "early_stopping_min_delta": 1e-05,
+  "seed": 42,
+  "device": "cuda",
+  "resolved_device": "cuda",
+  "time_split_boundaries": {
+    "train_end": 1601982560.3,
+    "valid_end": 1603000229.2
+  }
+}

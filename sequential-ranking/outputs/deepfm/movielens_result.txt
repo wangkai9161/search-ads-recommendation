@@ -1,0 +1,4 @@
+Best Valid AUC: 0.805816
+Test Loss     : 0.518521
+Test AUC      : 0.810798
+Test LogLoss  : 0.518521

@@ -1,0 +1,14 @@
+{
+  "epoch": 1,
+  "train_loss": 0.7089692394733429,
+  "val_loss": 0.6566760089397431,
+  "val_logloss": 0.6566760313445309,
+  "val_auc": 0.2915711739241151,
+  "val_pr_auc": 0.10396189206959423,
+  "val_brier": 0.21839844351887694,
+  "val_ece": 0.26666847519576553,
+  "val_positive_rate": 0.15299999713897705,
+  "run_name": "sponsored-search-deepfm",
+  "elapsed_seconds": 2.277421234175563,
+  "checkpoint": "./result/sponsored-search-deepfm/checkpoints/model_final.pth"
+}

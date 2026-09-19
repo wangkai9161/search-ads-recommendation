@@ -1,0 +1,17 @@
+{
+  "epoch": 2,
+  "train_loss": 0.5262702858269215,
+  "val_loss": 0.4797411100566387,
+  "val_logloss": 0.47974110631559286,
+  "val_auc": 0.7362777755060441,
+  "val_pr_auc": 0.43111056091552985,
+  "val_brier": 0.1468366739932245,
+  "val_ece": 0.23543680715486406,
+  "val_positive_rate": 0.10935000330209732,
+  "run_name": "sponsored-search-tune-fm-e8-lr0p001-s42",
+  "model": "fm",
+  "task": "cvr",
+  "target": "Sale",
+  "elapsed_seconds": 14.32201319001615,
+  "checkpoint": "./result/sponsored-search-tune-fm-e8-lr0p001-s42/checkpoints/model_final.pth"
+}

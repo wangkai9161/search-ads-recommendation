@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+data/raw/*
+!data/raw/README.md
+data/processed/*
+outputs/
+checkpoints/
+logs/
+*.ipynb_checkpoints/
+路线讲解.txt

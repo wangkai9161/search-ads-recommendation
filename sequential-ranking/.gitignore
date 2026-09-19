@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+env/
+*.log
+
+# Download MovieLens-1M locally; keep the repository lightweight.
+data/movielens/ml-1m/
+data/movielens/ml-1m.zip

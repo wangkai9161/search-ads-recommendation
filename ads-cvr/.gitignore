@@ -1,0 +1,23 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+env/
+.env
+.env.*
+*.log
+
+# The official Criteo file is large and must be downloaded under its license.
+data/criteo-sponsored-search/Criteo_Conversion_Search.tar.gz
+data/criteo-sponsored-search/data.tsv
+data/raw/
+
+# Generated preprocessing cache and disposable smoke-run artifacts.
+cache/
+result/experiments/cache-smoke*/
+result/experiments/calibration-smoke*/
+result/sponsored-search-*-rcache-smoke*/
+result/sponsored-search-*-rcalibration-smoke*/
+output/sponsored-search-*-rcache-smoke*/
+output/sponsored-search-*-rcalibration-smoke*/

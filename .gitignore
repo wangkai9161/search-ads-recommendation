@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+data/
+cache/
+checkpoints/
+*.pt
+*.pth
+*.pkl
+*.npy
+*.npz
+*.parquet
+*.csv
+*.tsv
+*.log
