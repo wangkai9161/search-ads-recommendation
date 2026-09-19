@@ -165,6 +165,22 @@ def _number(value: object) -> float | None:
     return None
 
 
+SUMMARY_FIELDS = (
+    "trial", "run_name", "model", "feature_set", "task", "target", "embedding_dim",
+    "learning_rate", "seed", "status", "error", "epoch", "train_loss", "train_logloss",
+    "val_loss", "val_logloss", "val_auc", "val_pr_auc", "val_brier",
+    "val_ece", "val_positive_rate", "best_epoch", "last_epoch", "elapsed_seconds",
+    "test_loss", "test_logloss", "test_auc", "test_pr_auc", "test_brier",
+    "test_ece", "test_positive_rate", "checkpoint",
+)
+
+
+def _summary_fields(rows: list[dict[str, object]]) -> list[str]:
+    known = set(SUMMARY_FIELDS)
+    extras = sorted({key for row in rows for key in row}.difference(known))
+    return [*SUMMARY_FIELDS, *extras]
+
+
 def _write_summary(
     rows: list[dict[str, object]],
     best: dict[str, object] | None,
@@ -174,15 +190,7 @@ def _write_summary(
 ) -> None:
     result_dir = experiment_dir
     result_dir.mkdir(parents=True, exist_ok=True)
-    fields = [
-        "trial", "run_name", "model", "feature_set", "task", "target", "embedding_dim",
-        "learning_rate", "seed", "status", "error", "epoch", "train_loss", "train_logloss",
-        "val_loss", "val_logloss", "val_auc", "val_pr_auc", "val_brier",
-        "val_ece", "val_positive_rate", "best_epoch", "last_epoch", "elapsed_seconds",
-        "test_loss", "test_logloss", "test_auc", "test_pr_auc", "test_brier",
-        "test_ece", "test_positive_rate",
-        "checkpoint",
-    ]
+    fields = _summary_fields(rows)
     with (result_dir / "cvr_tuning_summary.csv").open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=fields)
         writer.writeheader()

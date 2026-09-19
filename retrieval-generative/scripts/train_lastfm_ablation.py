@@ -151,7 +151,9 @@ def evaluate(model, split: LastFMSplit, device, topk: int, batch_size: int = 128
             user = start + offset
             target = int(split.test_items[user])
             covered.update(recommendations)
-            is_tail = split.item_popularity[target] <= tail_threshold
+            # A target never observed in training has no learned item signal;
+            # report tail recall only for rare but evaluable artists.
+            is_tail = 0 < split.item_popularity[target] <= tail_threshold
             if is_tail:
                 tail_count += 1
             if target in recommendations:
