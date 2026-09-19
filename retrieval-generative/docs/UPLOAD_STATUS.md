@@ -8,9 +8,9 @@
 
 | Repository | Scope |
 | --- | --- |
-| [`search-recommendation-learning`](https://github.com/wangkai9161/search-recommendation-learning) | MovieLens DSSM、负采样、FM/DeepFM、多兴趣、离散表示和生成式召回 |
-| [`movielens-recommendation`](https://github.com/wangkai9161/movielens-recommendation) | MovieLens Two-Tower、GRU4Rec、SASRec 和 Popularity baseline |
-| [`search-ads-cvr`](https://github.com/wangkai9161/search-ads-cvr) | Criteo Sponsored Search 点击后 CVR 预估 |
+| [`retrieval-generative`](../..) | MovieLens DSSM、负采样、FM/DeepFM、多兴趣、离散表示和生成式召回 |
+| [`sequential-ranking`](../../sequential-ranking/) | MovieLens Two-Tower、GRU4Rec、SASRec 和 Popularity baseline |
+| [`ads-cvr`](../../ads-cvr/) | Criteo Sponsored Search 点击后 CVR 预估 |
 
 ## Status for current resume
 

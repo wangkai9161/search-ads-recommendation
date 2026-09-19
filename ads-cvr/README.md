@@ -127,5 +127,5 @@ Test LogLoss/AUC/PR-AUC 为 `0.035917 / 0.995463 / 0.977513`；`no_time` 在第 
 当前文件是点击级转化日志，没有曝光未点击样本。因此本项目不把自己包装成
 完整 CTR/ESMM 系统；如果要严格建模 CTR 或 ESMM，需要曝光级日志。
 
-旧路径 `projects/search-recommendation-learning` 仍保留为兼容链接，新的代码和
+旧实验路径仅作历史说明，新的代码和
 文档入口统一使用本目录。

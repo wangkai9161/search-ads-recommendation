@@ -19,8 +19,8 @@
 | --- | --- | --- |
 | MovieLens-1M DSSM、Batch 内/随机负采样、FM/DeepFM、多兴趣和生成式召回 | 本仓库 | 已上传 |
 | LastFM 用户--艺术家双塔、负样本 0~5、BCE/BPR 和长尾权重 | 本仓库 | 待上传：当前仓库暂不包含对应数据处理、训练脚本和实验结果 |
-| MovieLens Two-Tower、GRU4Rec、SASRec、Popularity baseline | [`movielens-recommendation`](https://github.com/wangkai9161/movielens-recommendation) | 已上传至独立仓库，本仓库不重复放置 |
-| Criteo Sponsored Search 约 1,600 万条点击日志、LR/FM/Wide&Deep/DeepFM CVR | [`search-ads-cvr`](https://github.com/wangkai9161/search-ads-cvr) | 已上传至独立仓库，本仓库不重复放置 |
+| MovieLens Two-Tower、GRU4Rec、SASRec、Popularity baseline | [`sequential-ranking`](../sequential-ranking/) | 已合并为同一仓库的独立子项目 |
+| Criteo Sponsored Search 约 1,600 万条点击日志、LR/FM/Wide&Deep/DeepFM CVR | [`ads-cvr`](../ads-cvr/) | 已合并为同一仓库的独立子项目 |
 | Criteo Attribution CVR toy 基线 | 本仓库 | 待上传：当前本地有扩展代码，公开仓库以本 README 状态为准 |
 
 详细状态记录见 [`docs/UPLOAD_STATUS.md`](docs/UPLOAD_STATUS.md)。
@@ -83,7 +83,7 @@ FM、DeepFM 使用 300 用户、2 Epoch；负采样主对照使用 1,000 用户�
 - 候选召回和粗排前置建模：DSSM、多兴趣召回、Top-K 检索、候选覆盖分析。
 - 用户行为序列表征：从历史行为构造下一物品预测样本，可迁移到用户-查询-广告上下文。
 - 特征交互基础：FM/DeepFM 为 CTR/CVR 稀疏特征交叉做铺垫。
-- CVR 扩展入口：Criteo Attribution 代码目前待上传；已公开的完整 Criteo Sponsored Search CVR 实验见 [`search-ads-cvr`](https://github.com/wangkai9161/search-ads-cvr)。
+- CVR 扩展入口：Criteo Attribution 代码目前待上传；已公开的完整 Criteo Sponsored Search CVR 实验见 [`ads-cvr`](../ads-cvr/)。
 - 离线评估意识：区分 Recall/NDCG/覆盖率，避免只看单一指标。
 
 如果继续扩展为更完整的广告 CTR/CVR 项目，下一步会补充：
@@ -157,7 +157,7 @@ result/      训练结果、指标和可视化数据
 - MovieLens-1M 行为序列和下一物品预测样本。
 - DSSM、负采样对照、FM/DeepFM、多兴趣召回、离散表示和生成式召回最小链路。
 - Full-catalog Top-K 检索、历史物品过滤、Recall/NDCG/Item Coverage 评估。
-- Criteo Attribution CVR 的扩展代码当前标记为待上传；已公开的完整 Criteo Sponsored Search CVR 实验位于 [`search-ads-cvr`](https://github.com/wangkai9161/search-ads-cvr)。
+- Criteo Attribution CVR 的扩展代码当前标记为待上传；已公开的完整 Criteo Sponsored Search CVR 实验位于 [`ads-cvr`](../ads-cvr/)。
 
 当前边界：
 
