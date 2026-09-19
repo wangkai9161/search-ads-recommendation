@@ -5,7 +5,7 @@
 运行：
 
 ```powershell
-C:\Users\wangx\miniconda3\Scripts\conda.exe run -n py310 python scripts/run_discrete.py --clusters 16
+python scripts/run_discrete.py --clusters 16
 ```
 
 ## 结果

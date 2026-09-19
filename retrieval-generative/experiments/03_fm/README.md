@@ -7,7 +7,7 @@
 ## 运行
 
 ```powershell
-C:\Users\wangx\miniconda3\Scripts\conda.exe run -n py310 python scripts/train_fm.py --epochs 2 --max-users 300 --batch-size 512
+python scripts/train_fm.py --epochs 2 --max-users 300 --batch-size 512
 ```
 
 ## 结果
@@ -25,7 +25,7 @@ DeepFM 教学实现位于 `src/models/deepfm.py`，复用 DSSM 的用户历史�
 运行：
 
 ```powershell
-C:\Users\wangx\miniconda3\Scripts\conda.exe run -n py310 python scripts/train_deepfm.py --epochs 2 --max-users 300
+python scripts/train_deepfm.py --epochs 2 --max-users 300
 ```
 
 配置：300 用户、43,145 个训练样本、3,706 个物品、2 Epoch、CPU。

@@ -7,7 +7,7 @@
 ## 运行
 
 ```powershell
-C:\Users\wangx\miniconda3\Scripts\conda.exe run -n py310 python scripts/train_generative.py --epochs 1 --max-users 100 --batch-size 128 --embedding-dim 32
+python scripts/train_generative.py --epochs 1 --max-users 100 --batch-size 128 --embedding-dim 32
 ```
 
 ## 结果

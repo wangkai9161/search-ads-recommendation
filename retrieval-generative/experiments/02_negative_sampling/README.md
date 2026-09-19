@@ -3,8 +3,8 @@
 负采样代码复用 DSSM 入口，通过 `--negative-mode` 切换策略：
 
 ```powershell
-C:\Users\wangx\miniconda3\Scripts\conda.exe run -n py310 python scripts/train_dssm.py --negative-mode in_batch --epochs 2 --max-users 1000
-C:\Users\wangx\miniconda3\Scripts\conda.exe run -n py310 python scripts/train_dssm.py --negative-mode random --num-negatives 10 --epochs 2 --max-users 1000
+python scripts/train_dssm.py --negative-mode in_batch --epochs 2 --max-users 1000
+python scripts/train_dssm.py --negative-mode random --num-negatives 10 --epochs 2 --max-users 1000
 ```
 
 当前对比重点：Recall@10/50、NDCG@10/50、Item Coverage@50。本文件记录该专项的完整结果。

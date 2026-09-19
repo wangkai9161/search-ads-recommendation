@@ -13,7 +13,7 @@
 ## 运行方式
 
 ```powershell
-C:\Users\wangx\miniconda3\Scripts\conda.exe run -n py310 python scripts/train_dssm.py --epochs 2 --max-users 1000
+python scripts/train_dssm.py --epochs 2 --max-users 1000
 ```
 
 参数说明：
