@@ -1,0 +1,149 @@
+{
+  "dataset": {
+    "name": "Criteo Sponsored Search Conversion Log",
+    "rows": 15995634,
+    "target": "Sale after click"
+  },
+  "protocol": {
+    "split_mode": "time",
+    "train_fraction": 0.7,
+    "validation_fraction": 0.15,
+    "models": [
+      "lr",
+      "fm",
+      "wide_deep",
+      "deepfm"
+    ],
+    "feature_sets": [
+      "full"
+    ],
+    "epochs_max": 10,
+    "early_stopping_patience": 3,
+    "embedding_dims": [
+      16
+    ],
+    "learning_rates": [
+      0.001
+    ],
+    "seeds": [
+      42
+    ]
+  },
+  "selection": "minimize val_logloss; tie-break maximize val_pr_auc then val_auc",
+  "best_model": "deepfm",
+  "results": [
+    {
+      "model": "lr",
+      "feature_set": "full",
+      "embedding_dim": 16,
+      "learning_rate": 0.001,
+      "seed": 42,
+      "status": "ok",
+      "best_epoch": 10,
+      "last_epoch": 10,
+      "val_logloss": 0.20269888295982963,
+      "val_auc": 0.9190292091547293,
+      "val_pr_auc": 0.6954560842042349,
+      "val_brier": 0.05750901296528097,
+      "val_ece": 0.039176716122194574,
+      "test_logloss": 0.19642090980420274,
+      "test_auc": 0.9205897963625512,
+      "test_pr_auc": 0.68968127195238,
+      "test_brier": 0.05551043605425921,
+      "test_ece": 0.03785710920042499
+    },
+    {
+      "model": "fm",
+      "feature_set": "full",
+      "embedding_dim": 16,
+      "learning_rate": 0.001,
+      "seed": 42,
+      "status": "ok",
+      "best_epoch": 10,
+      "last_epoch": 10,
+      "val_logloss": 0.21032999729951818,
+      "val_auc": 0.8940394718067126,
+      "val_pr_auc": 0.6008392464901132,
+      "val_brier": 0.06121662288705054,
+      "val_ece": 0.009249701803881148,
+      "test_logloss": 0.20634571282923017,
+      "test_auc": 0.8913729121473992,
+      "test_pr_auc": 0.5848455168801204,
+      "test_brier": 0.05976869022582674,
+      "test_ece": 0.007406472775048756
+    },
+    {
+      "model": "wide_deep",
+      "feature_set": "full",
+      "embedding_dim": 16,
+      "learning_rate": 0.001,
+      "seed": 42,
+      "status": "ok",
+      "best_epoch": 8,
+      "last_epoch": 10,
+      "val_logloss": 0.039238503231684804,
+      "val_auc": 0.9944740379036093,
+      "val_pr_auc": 0.9756726000700938,
+      "val_brier": 0.009980332888437304,
+      "val_ece": 0.002726033432879471,
+      "test_logloss": 0.03984646933041147,
+      "test_auc": 0.9943442553698024,
+      "test_pr_auc": 0.9737504856170363,
+      "test_brier": 0.01025657790711914,
+      "test_ece": 0.00464954086102625
+    },
+    {
+      "model": "deepfm",
+      "feature_set": "full",
+      "embedding_dim": 16,
+      "learning_rate": 0.001,
+      "seed": 42,
+      "status": "ok",
+      "best_epoch": 3,
+      "last_epoch": 6,
+      "val_logloss": 0.03782739310993821,
+      "val_auc": 0.9951024324069243,
+      "val_pr_auc": 0.9772504354183493,
+      "val_brier": 0.009845706952621314,
+      "val_ece": 0.0015702179990045313,
+      "test_logloss": 0.03590953648170712,
+      "test_auc": 0.9954530971450946,
+      "test_pr_auc": 0.9774854848018408,
+      "test_brier": 0.009405773548202165,
+      "test_ece": 0.001592006157522583
+    }
+  ],
+  "calibration": {
+    "temperature": 1.0,
+    "splits": {
+      "validation": {
+        "raw": {
+          "logloss": 0.03782739304142829,
+          "brier": 0.009845706949365004,
+          "ece": 0.0015702179772454803,
+          "positive_rate": 0.10282836109399796
+        },
+        "temperature_scaled": {
+          "logloss": 0.03782739304142829,
+          "brier": 0.009845706949365004,
+          "ece": 0.0015702179772454803,
+          "positive_rate": 0.10282836109399796
+        }
+      },
+      "test": {
+        "raw": {
+          "logloss": 0.03590953641694839,
+          "brier": 0.009405773547414157,
+          "ece": 0.0015920061432394615,
+          "positive_rate": 0.09830824285745621
+        },
+        "temperature_scaled": {
+          "logloss": 0.03590953641694839,
+          "brier": 0.009405773547414157,
+          "ece": 0.0015920061432394615,
+          "positive_rate": 0.09830824285745621
+        }
+      }
+    }
+  }
+}

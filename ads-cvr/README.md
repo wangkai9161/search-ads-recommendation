@@ -8,6 +8,8 @@ Conversion Log 数据。每一行是一条广告点击，目标是预测点击�
 P(Sale = 1 | click context)
 ```
 
+下载、许可、文件位置和校验值见 [`DATA.md`](DATA.md)。
+
 ## 项目定位
 
 - 面向搜索广告粗排/转化预估：LR、FM、Wide & Deep、DeepFM。
@@ -73,6 +75,22 @@ python main.py \
 PR-AUC、Brier Score 和 ECE。
 
 ## 当前结果
+
+### 全量四模型统一对比（2026-09-20）
+
+在 15,995,634 行完整数据上，固定时间切分、完整特征、embedding 维度 16、学习率
+0.001、随机种子 42，并设置最多 10 epoch 与 validation LogLoss Early Stopping：
+
+| 模型 | 最佳/结束轮次 | Test LogLoss | Test PR-AUC | Test AUC | Test ECE |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| LR | 10/10 | 0.196421 | 0.689681 | 0.920590 | 0.037857 |
+| FM | 10/10 | 0.206346 | 0.584846 | 0.891373 | 0.007406 |
+| Wide & Deep | 8/10 | 0.039846 | 0.973750 | 0.994344 | 0.004650 |
+| DeepFM | 3/6 | **0.035910** | **0.977485** | **0.995453** | **0.001592** |
+
+DeepFM 按验证集 LogLoss 选为最佳模型。Temperature Scaling 得到温度 1.0，测试
+LogLoss 与 ECE 不变，未带来额外校准收益。公开的路径无关证据见
+[`../evidence/rtx5080-20260920/cvr-full-four-model-report.md`](../evidence/rtx5080-20260920/cvr-full-four-model-report.md)。
 
 在严格时间切分的 20 万行子集实验中，DeepFM 使用 embedding 维度 16、学习率
 0.001，训练 8 个 epoch 后验证集 `LogLoss=0.321006`、`PR-AUC=0.479342`、

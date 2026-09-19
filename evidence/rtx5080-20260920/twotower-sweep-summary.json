@@ -1,0 +1,46 @@
+{
+  "dataset": "MovieLens-1M ratings >= 3",
+  "protocol": "10 epochs, per-user final holdout, full-catalog evaluation with history filtering",
+  "results": [
+    {
+      "negatives": 4,
+      "learning_rate": 0.001,
+      "epochs": 10,
+      "best_epoch": 9,
+      "recall@20": 0.0705414803775459,
+      "ndcg@20": 0.0249807835492141
+    },
+    {
+      "negatives": 10,
+      "learning_rate": 0.0005,
+      "epochs": 10,
+      "best_epoch": 1,
+      "recall@20": 0.0695479384003974,
+      "ndcg@20": 0.0255164915624978
+    },
+    {
+      "negatives": 10,
+      "learning_rate": 0.001,
+      "epochs": 10,
+      "best_epoch": 1,
+      "recall@20": 0.0693823480708726,
+      "ndcg@20": 0.0253189440424534
+    },
+    {
+      "negatives": 20,
+      "learning_rate": 0.001,
+      "epochs": 10,
+      "best_epoch": 2,
+      "recall@20": 0.0687199867527736,
+      "ndcg@20": 0.0250765710016854
+    },
+    {
+      "negatives": 1,
+      "learning_rate": 0.001,
+      "epochs": 10,
+      "best_epoch": 10,
+      "recall@20": 0.0412319920516641,
+      "ndcg@20": 0.0142920719801295
+    }
+  ]
+}

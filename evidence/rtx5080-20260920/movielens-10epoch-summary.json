@@ -1,0 +1,39 @@
+{
+  "dataset": "MovieLens-1M ratings >= 3",
+  "split": "per-user final interaction holdout",
+  "evaluation": "full catalog with prior interactions filtered",
+  "rows": [
+    {
+      "model": "twotower",
+      "epoch": 9.0,
+      "train_loss": 0.4622684061219266,
+      "recall@20": 0.0705414803775459,
+      "ndcg@20": 0.0249807835492141,
+      "training_epochs": 10
+    },
+    {
+      "model": "poprec",
+      "epoch": 0,
+      "train_loss": NaN,
+      "recall@20": 0.0672296737870508,
+      "ndcg@20": 0.0247917184621231,
+      "training_epochs": 0
+    },
+    {
+      "model": "gru4rec",
+      "epoch": 8,
+      "train_loss": 0.4042835421773841,
+      "recall@20": 0.0723749585955614,
+      "ndcg@20": 0.0294533748425526,
+      "training_epochs": 10
+    },
+    {
+      "model": "sasrec",
+      "epoch": 5,
+      "train_loss": 0.4445107362155055,
+      "recall@20": 0.0741967538920172,
+      "ndcg@20": 0.0313874001298623,
+      "training_epochs": 10
+    }
+  ]
+}

@@ -19,6 +19,21 @@ Reproducible offline experiments spanning recommendation retrieval, sequential r
 
 Large datasets, checkpoints, caches, and repeated trial artifacts are intentionally excluded. Small metrics, configurations, and figures remain next to the code that produced them.
 
+## Verified RTX 5080 evidence
+
+The reproducibility snapshot under [`evidence/rtx5080-20260920`](evidence/rtx5080-20260920/)
+records Python/PyTorch/CUDA versions, dataset hashes, fixed protocols, and
+machine-readable results. The source datasets and checkpoints remain on the
+experiment server and are not redistributed.
+
+| Task | Verified result |
+| --- | --- |
+| LastFM two-tower ablation | 92,826 interactions; best Recall@20 `0.085987` with BCE, 5 negatives, and tail weighting; rare-artist Tail Recall@20 remained `0` |
+| MovieLens unified retrieval | 10 epochs per learned model; SASRec was best at Recall@20 `0.074197`, ahead of Two-Tower `0.070541` |
+| Criteo full-data CVR | 15,995,634 rows; DeepFM test LogLoss/PR-AUC/AUC `0.035910 / 0.977485 / 0.995453` |
+
+These are offline public-dataset results, not production or online A/B claims.
+
 ## Quick checks
 
 Each subproject has an independent environment and README. A repository-wide syntax check can be run with:

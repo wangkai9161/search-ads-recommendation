@@ -1,0 +1,33 @@
+{
+  "recorded_at": "2026-09-20T06:40:58+08:00",
+  "hostname": "user-MZF2-AC0-00",
+  "platform": "Linux-6.8.0-111-generic-x86_64-with-glibc2.35",
+  "python": "3.10.12 (main, Mar  3 2026, 11:56:32) [GCC 11.4.0]",
+  "torch": "2.11.0+cu128",
+  "torch_cuda": "12.8",
+  "cuda_available": true,
+  "gpus": [
+    "NVIDIA GeForce RTX 5080",
+    "NVIDIA GeForce RTX 5080",
+    "NVIDIA GeForce RTX 5080",
+    "NVIDIA GeForce RTX 5080"
+  ],
+  "git_commit": "eecbbdf11f9a47d4ec8dd4de0974efd84cac3ad4",
+  "datasets": [
+    {
+      "name": "user_artists.dat",
+      "bytes": 1296455,
+      "sha256": "001400dc3c7d2667fca6e4ea6dc6acc31a9dd28ad5cd0f74cea988c019934d3b"
+    },
+    {
+      "name": "ratings.dat",
+      "bytes": 24594131,
+      "sha256": "506d64ca44484487c11dc2d9a28de5c54948213e6b96285e298afe28d6ea4e0f"
+    },
+    {
+      "name": "CriteoSearchData",
+      "bytes": 6426808162,
+      "sha256": "a2ee46feec6008f901ab1ce5e51a44b591b5194285ef86a141b5cc54dbde0567"
+    }
+  ]
+}

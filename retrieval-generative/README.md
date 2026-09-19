@@ -9,16 +9,16 @@
 - 使用 `Recall@10/50`、`NDCG@10/50`、`Item Coverage` 等召回指标，避免只看 AUC。
 - 实现 FM、DeepFM、多兴趣召回和 Decoder-only 下一物品预测教学版本。
 - 增加 MiniBatch K-Means / VQ 风格 Item Code 实验。
-- 所有实验使用 MovieLens 1M，训练入口可由 `py310` 环境直接运行。
+- 实验使用 MovieLens-1M 与 HetRec LastFM 2K，训练入口可由 `py310` 环境直接运行。
 
 ## 简历与仓库对应关系
 
-简历中的相关内容分布在三个独立仓库。下面的状态以面试官当前能够打开的公开仓库为准；标记为“待上传”的内容暂不应描述为本仓库已经完成。
+简历中的相关内容分布在统一仓库的三个子项目。下面的状态以面试官当前能够打开的公开代码和证据为准；标记为“待上传”的内容暂不应描述为已经完成。
 
 | 简历内容 | 对应仓库 | 当前状态 |
 | --- | --- | --- |
 | MovieLens-1M DSSM、Batch 内/随机负采样、FM/DeepFM、多兴趣和生成式召回 | 本仓库 | 已上传 |
-| LastFM 用户--艺术家双塔、负样本 0~5、BCE/BPR 和长尾权重 | 本仓库 | 待上传：当前仓库暂不包含对应数据处理、训练脚本和实验结果 |
+| LastFM 用户--艺术家双塔、负样本 0~5、BCE/BPR 和长尾权重 | 本仓库 | 已上传：`src/data/lastfm.py`、`scripts/train_lastfm_ablation.py` 与统一证据目录 |
 | MovieLens Two-Tower、GRU4Rec、SASRec、Popularity baseline | [`sequential-ranking`](../sequential-ranking/) | 已合并为同一仓库的独立子项目 |
 | Criteo Sponsored Search 约 1,600 万条点击日志、LR/FM/Wide&Deep/DeepFM CVR | [`ads-cvr`](../ads-cvr/) | 已合并为同一仓库的独立子项目 |
 | Criteo Attribution CVR toy 基线 | 本仓库 | 待上传：当前本地有扩展代码，公开仓库以本 README 状态为准 |
@@ -33,6 +33,23 @@
 | 是否有可比实验？ | `experiments/` 按阶段记录 DSSM、负采样、FM/DeepFM、多兴趣和生成式召回结果。 |
 | 是否只看 AUC？ | 统一使用 `Recall@10/50`、`NDCG@10/50`、`Item Coverage@50`，更贴近召回阶段。 |
 | 是否夸大成工业广告系统？ | 没有。当前使用 MovieLens-1M，定位为可复现离线实验；广告 CVR 扩展路径在下方单独说明。 |
+
+## LastFM 双塔消融
+
+在 HetRec LastFM 2K 的 92,826 条有效用户--艺术家交互上，对每个用户固定随机留出
+一个测试目标。原数据不含时间戳，因此该切分不描述为时间切分。所有配置训练 10
+轮并在过滤历史交互后的完整物品库上评估。
+
+| 配置 | 最佳轮次 | Recall@20 | NDCG@20 | Coverage@20 |
+| --- | ---: | ---: | ---: | ---: |
+| BCE，0 个负样本 | 9 | 0.018047 | 0.006980 | 0.121014 |
+| BCE，3 个负样本 | 2 | 0.074841 | 0.025292 | 0.047487 |
+| BPR，5 个负样本 | 1 | 0.078556 | 0.030690 | 0.002326 |
+| BCE，5 个负样本，长尾加权 | 1 | **0.085987** | 0.031289 | 0.003574 |
+
+长尾加权提高了本轮总体 Recall，但各配置的稀有艺术家 Tail Recall@20 仍为 0，
+不能据此声称已经解决长尾召回。完整 9 组结果见
+[`../evidence/rtx5080-20260920/lastfm/report.md`](../evidence/rtx5080-20260920/lastfm/report.md)。
 
 ## 项目路线
 
@@ -119,6 +136,15 @@ python scripts/train_dssm.py --epochs 2 --max-users 1000 --negative-mode random 
 python scripts/train_multi_interest.py --epochs 2 --max-users 300 --num-interests 4
 ```
 
+运行 LastFM 消融：
+
+```bash
+python scripts/train_lastfm_ablation.py \
+  --data-file data/raw/lastfm/user_artists.dat \
+  --output-dir outputs/lastfm-ablation \
+  --epochs 10 --device cuda
+```
+
 > Criteo Attribution CVR toy 基线目前标记为“待上传”，因此暂不提供公开仓库内的运行命令。
 
 ## 仓库结构
@@ -130,7 +156,7 @@ docs/          项目结构、学习路线和边界说明
 experiments/   分阶段实验记录和结果
 notebooks/     探索性笔记
 scripts/       MovieLens 训练与实验入口
-src/data/      MovieLens、MIND 数据读取
+src/data/      MovieLens、LastFM、MIND 数据读取
 src/evaluation/Recall、NDCG、Item Coverage
 src/models/    DSSM、FM、DeepFM、多兴趣、生成式、离散化模型
 tests/         基础测试

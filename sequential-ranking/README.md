@@ -57,6 +57,24 @@ bash run_compare.sh
 
 ### GPU 全量管线验证
 
+#### 10 Epoch 统一召回评估（2026-09-20）
+
+在 RTX 5080、MovieLens-1M、评分 `>=3` 的正反馈上，对每个用户留出最后一次交互，
+过滤历史物品后进行完整物品库 Recall@20/NDCG@20 评估。学习模型均训练 10 轮：
+
+| 模型 | 最佳轮次 | Recall@20 | NDCG@20 |
+| --- | ---: | ---: | ---: |
+| Popularity | - | 0.067230 | 0.024792 |
+| Two-Tower | 9 | 0.070541 | 0.024981 |
+| GRU4Rec | 8 | 0.072375 | 0.029453 |
+| SASRec | 5 | **0.074197** | **0.031387** |
+
+本轮结果中 SASRec 最佳。额外 Two-Tower 负样本与学习率复核的最佳 Recall@20 仍为
+`0.070541`，未超过 SASRec。完整结果见
+[`../evidence/rtx5080-20260920/movielens-10epoch-report.md`](../evidence/rtx5080-20260920/movielens-10epoch-report.md)。
+
+#### 历史 1 Epoch 管线验证
+
 以下结果均使用外部 `py310` 环境和 GPU 0（RTX 5080），MovieLens-1M 全量数据，
 每个模型运行 1 个 epoch；checkpoint 和召回结果归档在 `outputs/full-gpu/`：
 
@@ -71,8 +89,7 @@ PopRec Recall@20 `0.042722` / NDCG@20 `0.014712`，GRU4Rec Recall@20
 `0.020205` / NDCG@20 `0.007084`，SASRec Recall@20 `0.020371` /
 NDCG@20 `0.006478`。
 
-召回模型采用每个用户最后一条交互做 leave-one-out 验证；这些是管线验证结果，
-不是多轮调参后的最终模型结论。
+该组旧结果只用于保留历史管线记录，不作为当前模型优劣结论。
 
 ## 与 CVR 项目的分工
 

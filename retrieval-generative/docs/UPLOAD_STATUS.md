@@ -1,6 +1,6 @@
 # Resume and Repository Upload Status
 
-更新时间：2026-09-07
+更新时间：2026-09-20
 
 本文档用于核对简历描述与公开 GitHub 仓库，不代表尚未上传的内容已经完成。
 
@@ -20,9 +20,9 @@
 | Batch negatives versus random 10 negatives | Uploaded | `experiments/02_negative_sampling/` and `docs/EXPERIMENTS.md` |
 | FM/DeepFM recall | Uploaded | `src/models/fm.py`, `src/models/deepfm.py` |
 | Multi-interest Router | Uploaded | `src/models/multi_interest.py` and `experiments/04_multi_interest/` |
-| LastFM user-artist experiment | Pending upload | Add dataset preparation, train entry, fixed configurations and result table before claiming it is in this repository |
-| Two-Tower, GRU4Rec, SASRec and Popularity comparison | Uploaded separately | Use `movielens-recommendation` as the resume link; do not imply these files are in this repository |
-| Criteo Sponsored Search full CVR experiment | Uploaded separately | Use `search-ads-cvr` as the resume link |
+| LastFM user-artist experiment | Uploaded | `src/data/lastfm.py`, `scripts/train_lastfm_ablation.py`, and `../../evidence/rtx5080-20260920/lastfm/` |
+| Two-Tower, GRU4Rec, SASRec and Popularity comparison | Uploaded | Unified repository subproject `sequential-ranking/`; current 10-epoch result has SASRec, not Two-Tower, as best |
+| Criteo Sponsored Search full CVR experiment | Uploaded | Unified repository subproject `ads-cvr/`; four-model 15,995,634-row evidence is under `evidence/rtx5080-20260920/` |
 | Criteo Attribution toy CVR extension | Pending upload | The local working tree contains an extension, but it is not part of the current public commit until pushed |
 
 ## Resume wording rule
