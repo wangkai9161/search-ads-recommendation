@@ -131,32 +131,32 @@ def evaluate_topk(model, train_df, val_df, num_users, num_items, device, topk=20
 
     recall_sum = 0.0
     ndcg_sum = 0.0
-    count = 0
+    users = val_df["user_id"].to_numpy(dtype=np.int64)
+    targets = val_df["item_id"].to_numpy(dtype=np.int64)
+    batch_size = 256
 
-    for _, row in val_df.iterrows():
-        user = int(row["user_id"])
-        true_item = int(row["item_id"])
+    for start in range(0, len(users), batch_size):
+        end = min(start + batch_size, len(users))
+        batch_users = torch.from_numpy(users[start:end]).to(device)
+        batch_targets = torch.from_numpy(targets[start:end]).to(device)
+        scores = torch.matmul(model.encode_user(batch_users), item_vecs.t())
 
-        user_tensor = torch.tensor([user], dtype=torch.long, device=device)
-        user_vec = model.encode_user(user_tensor)
+        # 过滤训练集中已交互物品，避免推荐用户已经看过的物品。
+        for row_index, user in enumerate(users[start:end]):
+            seen = user_train_pos.get(int(user), set())
+            if seen:
+                scores[row_index, torch.tensor(sorted(seen), dtype=torch.long, device=device)] = -torch.inf
 
-        scores = torch.matmul(user_vec, item_vecs.t()).reshape(-1)
+        top_items = torch.topk(scores, k=topk, dim=1).indices
+        matches = top_items.eq(batch_targets[:, None])
+        recall_sum += float(matches.any(dim=1).sum().item())
+        for row_index in range(len(batch_users)):
+            positions = matches[row_index].nonzero(as_tuple=False)
+            if positions.numel():
+                rank = int(positions[0, 0].item()) + 1
+                ndcg_sum += 1.0 / np.log2(rank + 1.0)
 
-        # 过滤训练集中已交互物品，避免推荐用户已经看过的物品
-        seen = user_train_pos.get(user, set())
-        if len(seen) > 0:
-            seen_idx = torch.tensor(list(seen), dtype=torch.long, device=device)
-            scores[seen_idx] = -1e9
-
-        top_items = torch.topk(scores, k=topk).indices.cpu().numpy().tolist()
-
-        if true_item in top_items:
-            recall_sum += 1.0
-            rank = top_items.index(true_item) + 1
-            ndcg_sum += 1.0 / np.log2(rank + 1.0)
-
-        count += 1
-
+    count = len(users)
     return recall_sum / count, ndcg_sum / count
 
 
