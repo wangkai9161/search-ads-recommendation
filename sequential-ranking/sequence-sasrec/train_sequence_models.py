@@ -68,7 +68,9 @@ class SeqDataset(Dataset):
         padded = np.zeros(self.max_len, dtype=np.int64)
 
         if len(input_seq) > 0:
-            padded[-len(input_seq):] = np.array(input_seq, dtype=np.int64)
+            # Both pack_padded_sequence and last_idx below expect valid tokens
+            # to form a prefix followed by padding.
+            padded[:len(input_seq)] = np.array(input_seq, dtype=np.int64)
 
         neg_item = self.sample_negative(seq_set)
 
@@ -100,6 +102,8 @@ class GRU4Rec(nn.Module):
         self.proj = nn.Linear(hidden_dim, embed_dim)
 
         nn.init.xavier_uniform_(self.item_emb.weight)
+        with torch.no_grad():
+            self.item_emb.weight[0].zero_()
 
     def forward(self, seq):
         emb = self.item_emb(seq)
@@ -159,6 +163,8 @@ class SASRec(nn.Module):
 
         nn.init.xavier_uniform_(self.item_emb.weight)
         nn.init.xavier_uniform_(self.pos_emb.weight)
+        with torch.no_grad():
+            self.item_emb.weight[0].zero_()
 
     def forward(self, seq):
         batch_size, seq_len = seq.shape
@@ -247,6 +253,13 @@ def evaluate_deep_model(model, dataset, device, topk=20):
         user_vec = model.forward(seq)
         scores = torch.matmul(user_vec, item_vecs.t())
 
+        # Use the same full-catalog protocol as Two-Tower: previously consumed
+        # items are not valid recommendations for the held-out next item.
+        for row in range(seq.size(0)):
+            seen = seq[row][seq[row].ne(0)]
+            if seen.numel() > 0:
+                scores[row, seen - 1] = -torch.inf
+
         top_items = torch.topk(scores, k=topk, dim=1).indices + 1
 
         for i in range(seq.size(0)):
@@ -265,14 +278,17 @@ def evaluate_deep_model(model, dataset, device, topk=20):
 
 def evaluate_poprec(train_df, val_df, topk=20):
     popular_items = train_df["item_id"].value_counts().index.tolist()
-    top_items = popular_items[:topk]
+    user_seen = train_df.groupby("user_id")["item_id"].apply(set).to_dict()
 
     recall_sum = 0.0
     ndcg_sum = 0.0
     count = 0
 
     for _, row in val_df.iterrows():
+        user = int(row["user_id"])
         target = int(row["item_id"])
+        seen = user_seen.get(user, set())
+        top_items = [item for item in popular_items if item not in seen][:topk]
 
         if target in top_items:
             recall_sum += 1.0

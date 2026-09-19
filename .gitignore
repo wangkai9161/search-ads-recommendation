@@ -1,8 +1,12 @@
 __pycache__/
 *.py[cod]
 .venv/
+.venv-py310/
+.runtime/
 .env
 data/
+!retrieval-generative/src/data/
+!retrieval-generative/src/data/lastfm.py
 cache/
 checkpoints/
 *.pt
