@@ -358,11 +358,24 @@ def read_sponsored_search(
 
 FEATURE_SETS = {
     "full": (SPARSE_COLUMNS, DENSE_COLUMNS),
+    "clean": (SPARSE_COLUMNS, ("click_timestamp", "nb_clicks_1week")),
     "no_user_id": (tuple(name for name in SPARSE_COLUMNS if name != "user_id"), DENSE_COLUMNS),
     "no_product_id": (tuple(name for name in SPARSE_COLUMNS if name != "product_id"), DENSE_COLUMNS),
     "no_entity_ids": (
         tuple(name for name in SPARSE_COLUMNS if name not in {"user_id", "product_id"}),
         DENSE_COLUMNS,
+    ),
+    "clean_no_user_id": (
+        tuple(name for name in SPARSE_COLUMNS if name != "user_id"),
+        ("click_timestamp", "nb_clicks_1week"),
+    ),
+    "clean_no_product_id": (
+        tuple(name for name in SPARSE_COLUMNS if name != "product_id"),
+        ("click_timestamp", "nb_clicks_1week"),
+    ),
+    "clean_no_entity_ids": (
+        tuple(name for name in SPARSE_COLUMNS if name not in {"user_id", "product_id"}),
+        ("click_timestamp", "nb_clicks_1week"),
     ),
     "coarse_context": (
         tuple(
@@ -379,6 +392,22 @@ FEATURE_SETS = {
             }
         ),
         DENSE_COLUMNS,
+    ),
+    "clean_coarse_context": (
+        tuple(
+            name
+            for name in SPARSE_COLUMNS
+            if name
+            not in {
+                "audience_id",
+                "product_brand",
+                "product_id",
+                "product_title",
+                "partner_id",
+                "user_id",
+            }
+        ),
+        ("click_timestamp", "nb_clicks_1week"),
     ),
     "no_history": (SPARSE_COLUMNS, ("click_timestamp", "product_price")),
     "no_price": (SPARSE_COLUMNS, ("click_timestamp", "nb_clicks_1week")),

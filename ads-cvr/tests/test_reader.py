@@ -42,3 +42,15 @@ def test_single_numeric_feature_sets_are_isolated():
     assert feature_columns("time_only") == ((), ("click_timestamp",))
     assert feature_columns("click_history_only") == ((), ("nb_clicks_1week",))
     assert feature_columns("price_only") == ((), ("product_price",))
+
+
+def test_clean_feature_sets_exclude_product_price():
+    for name in (
+        "clean",
+        "clean_no_user_id",
+        "clean_no_product_id",
+        "clean_no_entity_ids",
+        "clean_coarse_context",
+    ):
+        _, dense = feature_columns(name)
+        assert dense == ("click_timestamp", "nb_clicks_1week")
