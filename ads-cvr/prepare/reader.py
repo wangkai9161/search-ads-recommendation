@@ -364,6 +364,22 @@ FEATURE_SETS = {
         tuple(name for name in SPARSE_COLUMNS if name not in {"user_id", "product_id"}),
         DENSE_COLUMNS,
     ),
+    "coarse_context": (
+        tuple(
+            name
+            for name in SPARSE_COLUMNS
+            if name
+            not in {
+                "audience_id",
+                "product_brand",
+                "product_id",
+                "product_title",
+                "partner_id",
+                "user_id",
+            }
+        ),
+        DENSE_COLUMNS,
+    ),
     "no_history": (SPARSE_COLUMNS, ("click_timestamp", "product_price")),
     "no_price": (SPARSE_COLUMNS, ("click_timestamp", "nb_clicks_1week")),
     "no_time": (SPARSE_COLUMNS, ("nb_clicks_1week", "product_price")),

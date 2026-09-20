@@ -22,3 +22,17 @@ def test_no_entity_ids_feature_set_removes_only_user_and_product_ids():
     assert "product_id" not in sparse
     assert "partner_id" in sparse
     assert dense == ("click_timestamp", "nb_clicks_1week", "product_price")
+
+
+def test_coarse_context_removes_identity_proxies():
+    sparse, _ = feature_columns("coarse_context")
+
+    assert {"device_type", "product_category_1", "product_country"}.issubset(sparse)
+    assert {
+        "audience_id",
+        "product_brand",
+        "product_id",
+        "product_title",
+        "partner_id",
+        "user_id",
+    }.isdisjoint(sparse)

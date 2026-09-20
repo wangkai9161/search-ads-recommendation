@@ -44,13 +44,19 @@ def compact(row: dict[str, object]) -> dict[str, object]:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--baseline-summary", type=Path, required=True)
-    parser.add_argument("--ablation-summary", type=Path, required=True)
+    parser.add_argument("--ablation-summary", type=Path, nargs="+", required=True)
     parser.add_argument("--cache-dir", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
     args = parser.parse_args()
 
     baseline_payload, baseline_rows = read_successful(args.baseline_summary)
-    ablation_payload, ablation_rows = read_successful(args.ablation_summary)
+    ablation_payloads = []
+    ablation_rows = []
+    for path in args.ablation_summary:
+        current_payload, current_rows = read_successful(path)
+        ablation_payloads.append(current_payload)
+        ablation_rows.extend(current_rows)
+    ablation_payload = ablation_payloads[0]
     labels = np.load(args.cache_dir / "labels.float32.npy", mmap_mode="r")
     split = np.load(args.cache_dir / "split.uint8.npy", mmap_mode="r")
     split_stats = {}
