@@ -8,6 +8,7 @@ import math
 import random
 import sys
 import time
+from copy import deepcopy
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
@@ -126,7 +127,15 @@ def train_epoch(model, loader, optimizer, device, loss_name: str) -> float:
 
 
 @torch.no_grad()
-def evaluate(model, split: LastFMSplit, device, topk: int, batch_size: int = 128) -> dict[str, float]:
+def evaluate(
+    model,
+    split: LastFMSplit,
+    targets: np.ndarray,
+    device,
+    topk: int,
+    extra_seen: np.ndarray | None = None,
+    batch_size: int = 128,
+) -> dict[str, float]:
     model.eval()
     item_ids = torch.arange(split.num_items, device=device)
     item_vectors = model.encode_item(item_ids)
@@ -134,6 +143,9 @@ def evaluate(model, split: LastFMSplit, device, topk: int, batch_size: int = 128
     ndcg = 0.0
     tail_hits = 0
     tail_count = 0
+    warm_hits = 0
+    warm_count = 0
+    cold_count = 0
     covered: set[int] = set()
     nonzero_popularity = split.item_popularity[split.item_popularity > 0]
     tail_threshold = float(np.median(nonzero_popularity))
@@ -144,30 +156,44 @@ def evaluate(model, split: LastFMSplit, device, topk: int, batch_size: int = 128
         scores = model.encode_user(users) @ item_vectors.T
         for row, user in enumerate(range(start, stop)):
             seen = split.user_seen[user]
+            if extra_seen is not None:
+                seen = seen | {int(extra_seen[user])}
             if seen:
                 scores[row, torch.tensor(sorted(seen), device=device)] = -torch.inf
         ranking = scores.topk(min(topk, split.num_items), dim=1).indices.cpu().tolist()
         for offset, recommendations in enumerate(ranking):
             user = start + offset
-            target = int(split.test_items[user])
+            target = int(targets[user])
             covered.update(recommendations)
             # A target never observed in training has no learned item signal;
             # report tail recall only for rare but evaluable artists.
             is_tail = 0 < split.item_popularity[target] <= tail_threshold
+            is_warm = split.item_popularity[target] > 0
             if is_tail:
                 tail_count += 1
+            if is_warm:
+                warm_count += 1
+            else:
+                cold_count += 1
             if target in recommendations:
                 hits += 1
                 rank = recommendations.index(target) + 1
                 ndcg += 1.0 / math.log2(rank + 1.0)
                 if is_tail:
                     tail_hits += 1
+                if is_warm:
+                    warm_hits += 1
 
     return {
         f"recall@{topk}": hits / split.num_users,
         f"ndcg@{topk}": ndcg / split.num_users,
         f"item_coverage@{topk}": len(covered) / split.num_items,
+        f"warm_recall@{topk}": warm_hits / max(warm_count, 1),
         f"tail_recall@{topk}": tail_hits / max(tail_count, 1),
+        "warm_target_count": warm_count,
+        "tail_target_count": tail_count,
+        "cold_target_count": cold_count,
+        "cold_target_rate": cold_count / split.num_users,
     }
 
 
@@ -180,25 +206,38 @@ def run_trial(args, split: LastFMSplit, trial: Trial, device) -> dict[str, objec
     model = UserItemTwoTower(split.num_users, split.num_items, args.embedding_dim, args.hidden_dim).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
     history: list[dict[str, float]] = []
-    best: dict[str, float] | None = None
+    best_val: dict[str, float] | None = None
+    best_state = None
     started = time.perf_counter()
     for epoch in range(1, args.epochs + 1):
         train_loss = train_epoch(model, loader, optimizer, device, trial.loss)
-        metrics = evaluate(model, split, device, args.topk)
+        metrics = evaluate(model, split, split.val_items, device, args.topk)
         row = {"epoch": epoch, "train_loss": train_loss, **metrics}
         history.append(row)
-        if best is None or metrics[f"recall@{args.topk}"] > best[f"recall@{args.topk}"]:
-            best = row
+        if best_val is None or metrics[f"recall@{args.topk}"] > best_val[f"recall@{args.topk}"]:
+            best_val = row
+            best_state = deepcopy(model.state_dict())
         print(
             f"[{trial.name}] epoch={epoch}/{args.epochs} loss={train_loss:.6f} "
             f"recall@{args.topk}={metrics[f'recall@{args.topk}']:.6f} "
             f"ndcg@{args.topk}={metrics[f'ndcg@{args.topk}']:.6f}",
             flush=True,
         )
+    model.load_state_dict(best_state)
+    test_metrics = evaluate(
+        model,
+        split,
+        split.test_items,
+        device,
+        args.topk,
+        extra_seen=split.val_items,
+    )
     return {
         "trial": asdict(trial),
         "name": trial.name,
-        "best": best,
+        "best_epoch": best_val["epoch"],
+        "best_val": best_val,
+        "test": test_metrics,
         "history": history,
         "elapsed_seconds": time.perf_counter() - started,
     }
@@ -215,15 +254,18 @@ def write_report(payload: dict[str, object], output_dir: Path, topk: int) -> Non
         f"Interactions: {payload['dataset']['num_interactions']:,}; users: {payload['dataset']['num_users']:,}; "
         f"artists: {payload['dataset']['num_items']:,}; epochs per trial: {payload['config']['epochs']}.",
         "",
-        f"| Trial | Best epoch | Recall@{topk} | NDCG@{topk} | Coverage@{topk} | Tail Recall@{topk} |",
-        "| --- | ---: | ---: | ---: | ---: | ---: |",
+        f"| Trial | Best epoch | Val Recall@{topk} | Test Recall@{topk} | Test NDCG@{topk} | "
+        f"Coverage@{topk} | Warm Recall@{topk} | Tail Recall@{topk} |",
+        "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
     ]
     for result in rows:
-        best = result["best"]
+        val = result["best_val"]
+        test = result["test"]
         lines.append(
-            f"| {result['name']} | {best['epoch']} | {best[f'recall@{topk}']:.6f} | "
-            f"{best[f'ndcg@{topk}']:.6f} | {best[f'item_coverage@{topk}']:.6f} | "
-            f"{best[f'tail_recall@{topk}']:.6f} |"
+            f"| {result['name']} | {result['best_epoch']} | {val[f'recall@{topk}']:.6f} | "
+            f"{test[f'recall@{topk}']:.6f} | {test[f'ndcg@{topk}']:.6f} | "
+            f"{test[f'item_coverage@{topk}']:.6f} | {test[f'warm_recall@{topk}']:.6f} | "
+            f"{test[f'tail_recall@{topk}']:.6f} |"
         )
     output_dir.joinpath("report.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 

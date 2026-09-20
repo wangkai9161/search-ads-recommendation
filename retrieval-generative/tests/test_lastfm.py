@@ -9,9 +9,9 @@ def test_lastfm_split_is_deterministic_and_leak_free(tmp_path: Path):
     data_file = tmp_path / "user_artists.dat"
     pd.DataFrame(
         {
-            "userID": [1, 1, 1, 2, 2, 2],
-            "artistID": [10, 11, 12, 10, 13, 14],
-            "weight": [4, 3, 2, 5, 2, 1],
+            "userID": [1, 1, 1, 1, 2, 2, 2, 2],
+            "artistID": [10, 11, 12, 15, 10, 13, 14, 16],
+            "weight": [4, 3, 2, 1, 5, 2, 1, 1],
         }
     ).to_csv(data_file, sep="\t", index=False)
 
@@ -19,7 +19,10 @@ def test_lastfm_split_is_deterministic_and_leak_free(tmp_path: Path):
     second = load_lastfm_split(data_file, seed=7)
 
     assert first.test_items.tolist() == second.test_items.tolist()
-    assert first.num_interactions == 6
+    assert first.val_items.tolist() == second.val_items.tolist()
+    assert first.num_interactions == 8
     assert first.num_users == 2
     for user, target in enumerate(first.test_items):
         assert int(target) not in first.user_seen[user]
+        assert int(first.val_items[user]) not in first.user_seen[user]
+        assert int(first.val_items[user]) != int(target)

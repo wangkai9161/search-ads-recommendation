@@ -83,12 +83,16 @@ class SponsoredSearchBatch:
     observed_conversion: np.ndarray
 
 
-def _hash_column(values: pd.Series, num_bins: int) -> np.ndarray:
+def _hash_column(values: pd.Series, num_bins: int, namespace: str) -> np.ndarray:
     if num_bins < 2:
         raise ValueError("num_bins must be at least 2")
     values = values.astype("string")
     missing = values.isna() | values.eq("") | values.eq("-1")
     hashed = pd.util.hash_pandas_object(values.fillna("-1"), index=False).to_numpy(dtype=np.uint64)
+    namespace_hash = pd.util.hash_pandas_object(
+        pd.Series([namespace], dtype="string"), index=False
+    ).to_numpy(dtype=np.uint64)[0]
+    hashed ^= namespace_hash
     result = (hashed % (num_bins - 1) + 1).astype(np.int64)
     result[missing.to_numpy()] = 0
     return result
@@ -276,7 +280,9 @@ class SponsoredSearchReader:
 
     def transform(self, chunk: pd.DataFrame, stats: DenseStats) -> SponsoredSearchBatch:
         sparse = (
-            np.column_stack([_hash_column(chunk[name], self.num_sparse_bins) for name in self.sparse_columns])
+            np.column_stack(
+                [_hash_column(chunk[name], self.num_sparse_bins, name) for name in self.sparse_columns]
+            )
             if self.sparse_columns else np.empty((len(chunk), 0), dtype=np.int64)
         )
         dense, valid = self._numeric_values(chunk)
@@ -352,6 +358,12 @@ def read_sponsored_search(
 
 FEATURE_SETS = {
     "full": (SPARSE_COLUMNS, DENSE_COLUMNS),
+    "no_user_id": (tuple(name for name in SPARSE_COLUMNS if name != "user_id"), DENSE_COLUMNS),
+    "no_product_id": (tuple(name for name in SPARSE_COLUMNS if name != "product_id"), DENSE_COLUMNS),
+    "no_entity_ids": (
+        tuple(name for name in SPARSE_COLUMNS if name not in {"user_id", "product_id"}),
+        DENSE_COLUMNS,
+    ),
     "no_history": (SPARSE_COLUMNS, ("click_timestamp", "product_price")),
     "no_price": (SPARSE_COLUMNS, ("click_timestamp", "nb_clicks_1week")),
     "no_time": (SPARSE_COLUMNS, ("nb_clicks_1week", "product_price")),

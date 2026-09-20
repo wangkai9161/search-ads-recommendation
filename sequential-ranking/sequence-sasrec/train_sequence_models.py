@@ -8,6 +8,7 @@ import os
 import math
 import argparse
 import random
+from copy import deepcopy
 import numpy as np
 import pandas as pd
 
@@ -32,8 +33,9 @@ def build_sequences(df):
 
 
 class SeqDataset(Dataset):
-    def __init__(self, user_seqs, num_items, max_len=50, mode="train", seed=42):
+    def __init__(self, user_seqs, num_items, max_len=50, mode="train", seed=42, max_samples=None):
         self.user_seqs = []
+        self.samples = []
         self.num_items = int(num_items)
         self.max_len = int(max_len)
         self.mode = mode
@@ -41,10 +43,22 @@ class SeqDataset(Dataset):
 
         for _, seq in user_seqs.items():
             if len(seq) >= 3:
+                seq_index = len(self.user_seqs)
                 self.user_seqs.append(seq)
+                if mode == "train":
+                    self.samples.extend((seq_index, target_index) for target_index in range(1, len(seq) - 2))
+                elif mode == "val":
+                    self.samples.append((seq_index, len(seq) - 2))
+                elif mode == "test":
+                    self.samples.append((seq_index, len(seq) - 1))
+                else:
+                    raise ValueError("mode must be train, val, or test")
+        if max_samples is not None and len(self.samples) > max_samples:
+            selected = self.rng.choice(len(self.samples), size=max_samples, replace=False)
+            self.samples = [self.samples[int(index)] for index in np.sort(selected)]
 
     def __len__(self):
-        return len(self.user_seqs)
+        return len(self.samples)
 
     def sample_negative(self, seq_set):
         while True:
@@ -53,15 +67,11 @@ class SeqDataset(Dataset):
                 return item
 
     def __getitem__(self, idx):
-        seq = self.user_seqs[idx]
+        seq_index, target_index = self.samples[idx]
+        seq = self.user_seqs[seq_index]
         seq_set = set(seq)
-
-        if self.mode == "train":
-            input_seq = seq[:-2]
-            pos_item = seq[-2]
-        else:
-            input_seq = seq[:-1]
-            pos_item = seq[-1]
+        input_seq = seq[:target_index]
+        pos_item = seq[target_index]
 
         input_seq = input_seq[-self.max_len:]
 
@@ -308,15 +318,19 @@ def prepare_data(data_path):
     df["item_id"] = pd.factorize(df["item_id"])[0] + 1
 
     df = df.sort_values(["user_id", "timestamp"]).reset_index(drop=True)
-
-    val_df = df.groupby("user_id").tail(1)
-    train_df = df.drop(val_df.index).reset_index(drop=True)
+    counts = df.groupby("user_id")["item_id"].transform("size")
+    df = df[counts >= 3].copy()
+    test_df = df.groupby("user_id").tail(1)
+    remaining = df.drop(test_df.index)
+    val_df = remaining.groupby("user_id").tail(1)
+    train_df = remaining.drop(val_df.index).reset_index(drop=True)
     val_df = val_df.reset_index(drop=True)
+    test_df = test_df.reset_index(drop=True)
 
     num_items = int(df["item_id"].max())
     user_seqs = build_sequences(df)
 
-    return df, train_df, val_df, user_seqs, num_items
+    return df, train_df, val_df, test_df, user_seqs, num_items
 
 
 def build_model(model_name, num_items, max_len, embed_dim, hidden_dim, num_heads, num_layers, dropout):
@@ -353,7 +367,8 @@ def train_deep_model(args, model_name, user_seqs, num_items, device):
         num_items=num_items,
         max_len=args.max_len,
         mode="train",
-        seed=args.seed
+        seed=args.seed,
+        max_samples=args.max_train_samples or None,
     )
 
     val_dataset = SeqDataset(
@@ -362,6 +377,13 @@ def train_deep_model(args, model_name, user_seqs, num_items, device):
         max_len=args.max_len,
         mode="val",
         seed=args.seed + 1
+    )
+    test_dataset = SeqDataset(
+        user_seqs=user_seqs,
+        num_items=num_items,
+        max_len=args.max_len,
+        mode="test",
+        seed=args.seed + 2,
     )
 
     train_loader = DataLoader(
@@ -386,6 +408,7 @@ def train_deep_model(args, model_name, user_seqs, num_items, device):
 
     best_recall = -1.0
     best_row = None
+    best_state = None
     history = []
 
     print("=" * 80)
@@ -406,8 +429,8 @@ def train_deep_model(args, model_name, user_seqs, num_items, device):
             "model": model_name,
             "epoch": epoch,
             "train_loss": train_loss,
-            f"recall@{args.topk}": recall,
-            f"ndcg@{args.topk}": ndcg
+            f"val_recall@{args.topk}": recall,
+            f"val_ndcg@{args.topk}": ndcg
         }
 
         history.append(row)
@@ -422,8 +445,21 @@ def train_deep_model(args, model_name, user_seqs, num_items, device):
         if recall > best_recall:
             best_recall = recall
             best_row = row
+            best_state = deepcopy(model.state_dict())
             torch.save(model.state_dict(), os.path.join(save_dir, "best_model.pth"))
 
+    model.load_state_dict(best_state)
+    test_recall, test_ndcg = evaluate_deep_model(
+        model=model,
+        dataset=test_dataset,
+        device=device,
+        topk=args.topk,
+    )
+    best_row = {
+        **best_row,
+        f"test_recall@{args.topk}": test_recall,
+        f"test_ndcg@{args.topk}": test_ndcg,
+    }
     pd.DataFrame(history).to_csv(os.path.join(save_dir, "train_history.csv"), index=False)
     pd.DataFrame([best_row]).to_csv(os.path.join(save_dir, "result.csv"), index=False)
 
@@ -432,30 +468,34 @@ def train_deep_model(args, model_name, user_seqs, num_items, device):
     return best_row
 
 
-def run_poprec(args, train_df, val_df):
+def run_poprec(args, train_df, val_df, test_df):
     save_dir = os.path.join(args.save_root, "poprec")
     os.makedirs(save_dir, exist_ok=True)
 
-    recall, ndcg = evaluate_poprec(
+    val_recall, val_ndcg = evaluate_poprec(
         train_df=train_df,
         val_df=val_df,
         topk=args.topk
     )
+    test_history = pd.concat([train_df, val_df], ignore_index=True)
+    test_recall, test_ndcg = evaluate_poprec(test_history, test_df, topk=args.topk)
 
     row = {
         "model": "poprec",
         "epoch": 0,
         "train_loss": np.nan,
-        f"recall@{args.topk}": recall,
-        f"ndcg@{args.topk}": ndcg
+        f"val_recall@{args.topk}": val_recall,
+        f"val_ndcg@{args.topk}": val_ndcg,
+        f"test_recall@{args.topk}": test_recall,
+        f"test_ndcg@{args.topk}": test_ndcg,
     }
 
     pd.DataFrame([row]).to_csv(os.path.join(save_dir, "result.csv"), index=False)
     pd.DataFrame([row]).to_csv(os.path.join(save_dir, "train_history.csv"), index=False)
 
     print(
-        f"[poprec] Recall@{args.topk}={recall:.6f} | "
-        f"NDCG@{args.topk}={ndcg:.6f}"
+        f"[poprec] val Recall@{args.topk}={val_recall:.6f} | "
+        f"test Recall@{args.topk}={test_recall:.6f}"
     )
 
     return row
@@ -503,6 +543,7 @@ def main():
     parser.add_argument("--batch_size", type=int, default=256)
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--max_train_samples", type=int, default=0)
 
     args = parser.parse_args()
 
@@ -512,7 +553,7 @@ def main():
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    df, train_df, val_df, user_seqs, num_items = prepare_data(args.data_path)
+    df, train_df, val_df, test_df, user_seqs, num_items = prepare_data(args.data_path)
 
     print(
         f"[Info] users={df['user_id'].nunique()}, "
@@ -525,7 +566,7 @@ def main():
 
     for model_name in run_models:
         if model_name == "poprec":
-            run_poprec(args, train_df, val_df)
+            run_poprec(args, train_df, val_df, test_df)
         else:
             train_deep_model(args, model_name, user_seqs, num_items, device)
 

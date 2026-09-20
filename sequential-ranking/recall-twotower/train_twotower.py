@@ -2,6 +2,7 @@
 import os
 import argparse
 import random
+from copy import deepcopy
 import numpy as np
 import pandas as pd
 import torch
@@ -17,21 +18,30 @@ def set_seed(seed=42):
         torch.cuda.manual_seed_all(seed)
 
 
-def leave_one_out_split(df):
+def leave_two_out_split(df):
     df = df.sort_values(["user_id", "timestamp"])
-    val_rows = df.groupby("user_id").tail(1)
-    train_rows = df.drop(val_rows.index)
-    return train_rows.reset_index(drop=True), val_rows.reset_index(drop=True)
+    counts = df.groupby("user_id")["item_id"].transform("size")
+    df = df[counts >= 3].copy()
+    test_rows = df.groupby("user_id").tail(1)
+    remaining = df.drop(test_rows.index)
+    val_rows = remaining.groupby("user_id").tail(1)
+    train_rows = remaining.drop(val_rows.index)
+    return (
+        train_rows.reset_index(drop=True),
+        val_rows.reset_index(drop=True),
+        test_rows.reset_index(drop=True),
+    )
 
 
 class PairDataset(Dataset):
-    def __init__(self, train_df, num_items, num_neg=4, seed=42):
+    def __init__(self, train_df, num_items, num_neg=4, seed=42, all_positive_df=None):
         self.users = train_df["user_id"].values.astype(np.int64)
         self.pos_items = train_df["item_id"].values.astype(np.int64)
         self.num_items = int(num_items)
         self.num_neg = int(num_neg)
         self.rng = np.random.default_rng(seed)
-        self.user_pos = train_df.groupby("user_id")["item_id"].apply(set).to_dict()
+        positives = train_df if all_positive_df is None else all_positive_df
+        self.user_pos = positives.groupby("user_id")["item_id"].apply(set).to_dict()
 
     def __len__(self):
         return len(self.users)
@@ -121,18 +131,18 @@ def train_one_epoch(model, loader, optimizer, device):
 
 
 @torch.no_grad()
-def evaluate_topk(model, train_df, val_df, num_users, num_items, device, topk=20):
+def evaluate_topk(model, history_df, target_df, num_items, device, topk=20):
     model.eval()
 
     all_items = torch.arange(num_items, dtype=torch.long, device=device)
     item_vecs = model.encode_item(all_items)
 
-    user_train_pos = train_df.groupby("user_id")["item_id"].apply(set).to_dict()
+    user_train_pos = history_df.groupby("user_id")["item_id"].apply(set).to_dict()
 
     recall_sum = 0.0
     ndcg_sum = 0.0
-    users = val_df["user_id"].to_numpy(dtype=np.int64)
-    targets = val_df["item_id"].to_numpy(dtype=np.int64)
+    users = target_df["user_id"].to_numpy(dtype=np.int64)
+    targets = target_df["item_id"].to_numpy(dtype=np.int64)
     batch_size = 256
 
     for start in range(0, len(users), batch_size):
@@ -180,6 +190,8 @@ def main():
 
     df = pd.read_csv(args.data_path)
     df = df[df["rating"] >= 3].copy()
+    eligible = df.groupby("user_id")["item_id"].transform("size") >= 3
+    df = df[eligible].copy()
 
     # 重新编码，保证 id 从 0 连续
     df["user_id"] = pd.factorize(df["user_id"])[0]
@@ -187,9 +199,15 @@ def main():
     num_users = int(df["user_id"].nunique())
     num_items = int(df["item_id"].nunique())
 
-    train_df, val_df = leave_one_out_split(df)
+    train_df, val_df, test_df = leave_two_out_split(df)
 
-    train_dataset = PairDataset(train_df, num_items=num_items, num_neg=args.num_neg, seed=args.seed)
+    train_dataset = PairDataset(
+        train_df,
+        num_items=num_items,
+        num_neg=args.num_neg,
+        seed=args.seed,
+        all_positive_df=df,
+    )
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=0)
 
     model = TwoTower(num_users, num_items, args.embed_dim, args.hidden_dim).to(device)
@@ -198,24 +216,50 @@ def main():
     print(f"[Info] users={num_users}, items={num_items}, train={len(train_df)}, val={len(val_df)}, device={device}")
 
     best_recall = -1.0
+    best_state = None
+    best_epoch = None
     history = []
 
     for epoch in range(1, args.epochs + 1):
         train_loss = train_one_epoch(model, train_loader, optimizer, device)
-        recall, ndcg = evaluate_topk(model, train_df, val_df, num_users, num_items, device, topk=args.topk)
+        recall, ndcg = evaluate_topk(model, train_df, val_df, num_items, device, topk=args.topk)
 
         print(f"Epoch {epoch:03d}/{args.epochs:03d} | TrainLoss={train_loss:.6f} | Recall@{args.topk}={recall:.6f} | NDCG@{args.topk}={ndcg:.6f}")
 
-        history.append({"epoch": epoch, "train_loss": train_loss, f"recall@{args.topk}": recall, f"ndcg@{args.topk}": ndcg})
+        history.append({
+            "epoch": epoch,
+            "train_loss": train_loss,
+            f"val_recall@{args.topk}": recall,
+            f"val_ndcg@{args.topk}": ndcg,
+        })
 
         if recall > best_recall:
             best_recall = recall
+            best_epoch = epoch
+            best_state = deepcopy(model.state_dict())
             torch.save(model.state_dict(), os.path.join(args.save_dir, "best_model.pth"))
 
+    model.load_state_dict(best_state)
+    test_history = pd.concat([train_df, val_df], ignore_index=True)
+    test_recall, test_ndcg = evaluate_topk(
+        model, test_history, test_df, num_items, device, topk=args.topk
+    )
+    best_history = history[best_epoch - 1]
+    result = {
+        "epoch": best_epoch,
+        "train_loss": best_history["train_loss"],
+        f"val_recall@{args.topk}": best_history[f"val_recall@{args.topk}"],
+        f"val_ndcg@{args.topk}": best_history[f"val_ndcg@{args.topk}"],
+        f"test_recall@{args.topk}": test_recall,
+        f"test_ndcg@{args.topk}": test_ndcg,
+    }
     pd.DataFrame(history).to_csv(os.path.join(args.save_dir, "train_history.csv"), index=False)
-    pd.DataFrame([history[int(np.argmax([h[f'recall@{args.topk}'] for h in history]))]]).to_csv(os.path.join(args.save_dir, "result.csv"), index=False)
+    pd.DataFrame([result]).to_csv(os.path.join(args.save_dir, "result.csv"), index=False)
 
-    print(f"[Done] best_recall@{args.topk}={best_recall:.6f}")
+    print(
+        f"[Done] best_val_recall@{args.topk}={best_recall:.6f} "
+        f"test_recall@{args.topk}={test_recall:.6f}"
+    )
     print(f"[Done] save_dir={args.save_dir}")
 
 

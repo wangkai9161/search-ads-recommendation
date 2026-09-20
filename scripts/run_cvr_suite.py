@@ -1,4 +1,4 @@
-"""Run the full-data four-model Criteo Sponsored Search comparison."""
+"""Run a configurable full-data Criteo Sponsored Search experiment."""
 
 import argparse
 import os
@@ -18,6 +18,10 @@ def main() -> None:
     parser.add_argument("--gpu", default="1")
     parser.add_argument("--epochs", type=int, default=10)
     parser.add_argument("--experiment-id", default="rtx5080-full-four-model-10ep")
+    parser.add_argument("--models", default="lr,fm,wide_deep,deepfm")
+    parser.add_argument("--feature-sets", default="full")
+    parser.add_argument("--seeds", default="42")
+    parser.add_argument("--calibration", action="store_true")
     args = parser.parse_args()
 
     env = os.environ.copy()
@@ -26,13 +30,13 @@ def main() -> None:
         args.python,
         "main.py",
         "--models",
-        "lr,fm,wide_deep,deepfm",
+        args.models,
         "--embedding-dims",
         "16",
         "--learning-rates",
         "0.001",
         "--seeds",
-        "42",
+        args.seeds,
         "--epochs",
         str(args.epochs),
         "--max-rows",
@@ -46,13 +50,14 @@ def main() -> None:
         "--split-mode",
         "time",
         "--feature-sets",
-        "full",
+        args.feature_sets,
         "--device",
         "cuda",
         "--experiment-id",
         args.experiment_id,
-        "--calibration",
     ]
+    if args.calibration:
+        command.append("--calibration")
     print(f"[run] {' '.join(command)}", flush=True)
     subprocess.run(command, cwd=ROOT / "ads-cvr", env=env, check=True)
 

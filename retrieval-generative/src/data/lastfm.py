@@ -11,6 +11,7 @@ import pandas as pd
 class LastFMSplit:
     train_users: np.ndarray
     train_items: np.ndarray
+    val_items: np.ndarray
     test_items: np.ndarray
     user_seen: list[set[int]]
     item_popularity: np.ndarray
@@ -34,18 +35,21 @@ def load_lastfm_split(data_file: str | Path, seed: int = 42) -> LastFMSplit:
 
     frame = frame.drop_duplicates(["userID", "artistID"]).copy()
     counts = frame.groupby("userID")["artistID"].transform("size")
-    frame = frame[counts >= 2].copy()
+    frame = frame[counts >= 3].copy()
     frame["user"] = pd.factorize(frame["userID"], sort=True)[0]
     frame["item"] = pd.factorize(frame["artistID"], sort=True)[0]
     frame = frame.sort_values(["user", "item"]).reset_index(drop=True)
 
     rng = np.random.default_rng(seed)
+    val_items = np.full(frame["user"].nunique(), -1, dtype=np.int64)
     test_items = np.full(frame["user"].nunique(), -1, dtype=np.int64)
     holdout_indices: list[int] = []
     for user, group in frame.groupby("user", sort=True):
-        chosen = int(rng.choice(group.index.to_numpy()))
-        holdout_indices.append(chosen)
-        test_items[int(user)] = int(frame.at[chosen, "item"])
+        chosen = rng.choice(group.index.to_numpy(), size=2, replace=False)
+        val_index, test_index = (int(chosen[0]), int(chosen[1]))
+        holdout_indices.extend((val_index, test_index))
+        val_items[int(user)] = int(frame.at[val_index, "item"])
+        test_items[int(user)] = int(frame.at[test_index, "item"])
 
     train = frame.drop(index=holdout_indices)
     train_users = train["user"].to_numpy(dtype=np.int64)
@@ -60,6 +64,7 @@ def load_lastfm_split(data_file: str | Path, seed: int = 42) -> LastFMSplit:
     return LastFMSplit(
         train_users=train_users,
         train_items=train_items,
+        val_items=val_items,
         test_items=test_items,
         user_seen=user_seen,
         item_popularity=item_popularity,

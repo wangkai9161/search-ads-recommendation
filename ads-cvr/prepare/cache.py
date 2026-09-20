@@ -18,7 +18,7 @@ from .reader import (
 )
 
 
-CACHE_VERSION = 1
+CACHE_VERSION = 2
 
 
 def build_or_load_cache(
