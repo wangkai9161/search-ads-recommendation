@@ -23,7 +23,10 @@ def main() -> None:
     parser.add_argument("--seeds", default="42")
     parser.add_argument("--calibration", action="store_true")
     args = parser.parse_args()
-    args.python = str(Path(args.python).resolve())
+    python_path = Path(args.python).expanduser()
+    if not python_path.is_absolute():
+        python_path = Path.cwd() / python_path
+    args.python = str(python_path.absolute())
 
     env = os.environ.copy()
     env["CUDA_VISIBLE_DEVICES"] = args.gpu
