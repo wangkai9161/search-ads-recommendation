@@ -10,6 +10,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def absolute_path(path: Path) -> Path:
+    return path.absolute() if path.is_absolute() else (Path.cwd() / path).absolute()
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--python", default=sys.executable)
@@ -22,11 +26,14 @@ def main() -> None:
     parser.add_argument("--feature-sets", default="full")
     parser.add_argument("--seeds", default="42")
     parser.add_argument("--calibration", action="store_true")
+    parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
     python_path = Path(args.python).expanduser()
     if not python_path.is_absolute():
         python_path = Path.cwd() / python_path
     args.python = str(python_path.absolute())
+    args.data_file = absolute_path(args.data_file)
+    args.cache_dir = absolute_path(args.cache_dir)
 
     env = os.environ.copy()
     env["CUDA_VISIBLE_DEVICES"] = args.gpu
@@ -62,6 +69,8 @@ def main() -> None:
     ]
     if args.calibration:
         command.append("--calibration")
+    if args.dry_run:
+        command.append("--dry-run")
     print(f"[run] {' '.join(command)}", flush=True)
     subprocess.run(command, cwd=ROOT / "ads-cvr", env=env, check=True)
 

@@ -137,6 +137,10 @@ def parse_seeds(value: str) -> list[int]:
     return seeds
 
 
+def absolute_path(path: Path) -> Path:
+    return path.absolute() if path.is_absolute() else (Path.cwd() / path).absolute()
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--python", default=sys.executable)
@@ -153,6 +157,10 @@ def main() -> None:
     if not python_path.is_absolute():
         python_path = Path.cwd() / python_path
     args.python = str(python_path.absolute())
+    args.movielens_dir = absolute_path(args.movielens_dir)
+    args.lastfm_file = absolute_path(args.lastfm_file)
+    args.runtime_dir = absolute_path(args.runtime_dir)
+    args.evidence_dir = absolute_path(args.evidence_dir)
 
     env = os.environ.copy()
     env["CUDA_VISIBLE_DEVICES"] = args.gpu
