@@ -149,6 +149,7 @@ def main() -> None:
     parser.add_argument("--gpu", default="0")
     parser.add_argument("--sequence-train-samples", type=int, default=200_000)
     args = parser.parse_args()
+    args.python = str(Path(args.python).resolve())
 
     env = os.environ.copy()
     env["CUDA_VISIBLE_DEVICES"] = args.gpu
