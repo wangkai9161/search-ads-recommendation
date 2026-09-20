@@ -21,7 +21,7 @@
 | FM/DeepFM recall | Uploaded | `src/models/fm.py`, `src/models/deepfm.py` |
 | Multi-interest Router | Uploaded | `src/models/multi_interest.py` and `experiments/04_multi_interest/` |
 | LastFM user-artist experiment | Uploaded | `src/data/lastfm.py`, `scripts/train_lastfm_ablation.py`, and `../../evidence/rtx5080-20260920/lastfm/` |
-| Two-Tower, GRU4Rec, SASRec and Popularity comparison | Uploaded | Unified repository subproject `sequential-ranking/`; current 10-epoch result has SASRec, not Two-Tower, as best |
+| Two-Tower, GRU4Rec, SASRec and Popularity comparison | Uploaded | Unified repository subproject `sequential-ranking/`; leakage-free three-seed result has GRU4Rec as best |
 | Criteo Sponsored Search full CVR experiment | Uploaded | Unified repository subproject `ads-cvr/`; four-model 15,995,634-row evidence is under `evidence/rtx5080-20260920/` |
 | Criteo Attribution toy CVR extension | Pending upload | The local working tree contains an extension, but it is not part of the current public commit until pushed |
 

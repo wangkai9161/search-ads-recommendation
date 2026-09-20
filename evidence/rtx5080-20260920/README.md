@@ -1,24 +1,19 @@
 # RTX 5080 Reproducibility Snapshot
 
-This directory contains the reviewed, lightweight evidence from the 2026-09-20
-remote run. Raw public datasets, mmap caches, logs, and model checkpoints remain
-on the experiment server.
+This directory contains the reviewed, lightweight evidence from the 2026-09-20 remote runs. Raw datasets, mmap caches, logs, and checkpoints remain on the experiment server.
 
-## Environment
+## Reviewed conclusions
 
-- Python 3.10.12
-- PyTorch 2.11.0 with CUDA 12.8
-- NVIDIA GeForce RTX 5080
-- Dataset byte sizes and SHA-256 values are recorded in `environment.json`.
+- Criteo: `product_price` has a near-deterministic relationship with `Sale` in the released file and is excluded from primary results. Clean DeepFM reaches test AUC `0.777870 +/- 0.001254` across three seeds.
+- MovieLens: leakage-free validation selection and prefix training make GRU4Rec best at Recall@20 `0.090979 +/- 0.002772`.
+- LastFM: BPR with one negative is best at Recall@20 `0.081076 +/- 0.003935`; Tail Recall@20 remains zero.
 
-## Conclusions
+## Files
 
-- LastFM: BCE with 5 negatives and tail weighting had the best aggregate
-  Recall@20 (`0.085987`), but rare-artist Tail Recall@20 remained zero.
-- MovieLens: SASRec had the best 10-epoch full-catalog Recall@20 (`0.074197`);
-  the controlled Two-Tower sweep did not exceed it.
-- Criteo Sponsored Search: DeepFM was selected by validation LogLoss and reached
-  test LogLoss/PR-AUC/AUC of `0.035910 / 0.977485 / 0.995453` on 15,995,634 rows.
+- `EXPERIMENT_REPORT_CN.md`: detailed Chinese audit report and interpretation.
+- `cvr-robust-report.md`, `cvr-robust-summary.json`: leakage-audited Criteo results.
+- `movielens-10epoch-report.md`, `movielens-10epoch-summary.json`: MovieLens multi-seed results.
+- `lastfm/report.md`, `lastfm/summary.json`: LastFM multi-seed ablation.
+- `environment.json`: runtime and dataset checksums.
 
-The JSON files are the machine-readable source for the Markdown tables. These
-offline results do not establish online lift or production performance.
+JSON files are the machine-readable source for the Markdown tables. These offline results do not establish online lift or production performance.

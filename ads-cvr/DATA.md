@@ -23,3 +23,12 @@ The 2026-09-20 experiment used:
 
 Each row is an ad click. `Sale` is the post-click conversion target;
 `SalesAmountInEuro` and `time_delay_for_conversion` are not prediction inputs.
+
+## Product-price audit
+
+Although the official description lists `product_price` as the advertised
+product price, the released file has a near-deterministic empirical relation
+between this field and `Sale`. On the chronological test split, 90.85% of rows
+have price 0, every row with a non-zero price is positive, and no negative row
+has a non-zero price. Primary `clean` experiments therefore exclude
+`product_price`; it is retained only for leakage diagnostics.

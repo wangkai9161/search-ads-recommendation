@@ -1,17 +1,15 @@
-# LastFM Two-Tower Ablation
+# LastFM Leakage-Free Multi-Seed Ablation
 
-HetRec LastFM implicit feedback with a fixed seeded per-user holdout. Because the dataset has no timestamps, the split is not chronological.
+Because LastFM has no timestamps, each seed changes both the random holdout and model initialization. Cold targets have no training interaction and are separated from warm and tail recall.
 
-Interactions: 92,826; users: 1,884; artists: 17,626; epochs per trial: 10.
-
-| Trial | Best epoch | Recall@20 | NDCG@20 | Coverage@20 | Tail Recall@20 |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| bce-neg0 | 9 | 0.018047 | 0.006980 | 0.121014 | 0.000000 |
-| bce-neg1 | 1 | 0.065817 | 0.021526 | 0.018495 | 0.000000 |
-| bce-neg3 | 2 | 0.074841 | 0.025292 | 0.047487 | 0.000000 |
-| bce-neg5 | 1 | 0.069533 | 0.024193 | 0.025984 | 0.000000 |
-| bpr-neg1 | 1 | 0.071125 | 0.029186 | 0.003120 | 0.000000 |
-| bpr-neg3 | 1 | 0.068471 | 0.030231 | 0.002950 | 0.000000 |
-| bpr-neg5 | 1 | 0.078556 | 0.030690 | 0.002326 | 0.000000 |
-| bce-neg5-tail | 1 | 0.085987 | 0.031289 | 0.003574 | 0.000000 |
-| bpr-neg5-tail | 1 | 0.071656 | 0.031437 | 0.003631 | 0.000000 |
+| Trial | Runs | Test Recall@20 | NDCG@20 | Coverage@20 | Warm Recall@20 | Tail Recall@20 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| bce-neg0 | 3 | 0.010621 +/- 0.005328 | 0.003335 +/- 0.001690 | 0.170071 | 0.012054 | 0.000000 |
+| bce-neg1 | 3 | 0.062489 +/- 0.003368 | 0.021801 +/- 0.000575 | 0.052649 | 0.070863 | 0.000000 |
+| bce-neg3 | 3 | 0.056293 +/- 0.001890 | 0.021676 +/- 0.001021 | 0.048130 | 0.063827 | 0.000000 |
+| bce-neg5 | 3 | 0.056293 +/- 0.003035 | 0.021314 +/- 0.000873 | 0.055883 | 0.063836 | 0.000000 |
+| bpr-neg1 | 3 | 0.081076 +/- 0.003935 | 0.033771 +/- 0.003527 | 0.002629 | 0.091927 | 0.000000 |
+| bpr-neg3 | 3 | 0.079306 +/- 0.002952 | 0.031748 +/- 0.004234 | 0.002307 | 0.089922 | 0.000000 |
+| bpr-neg5 | 3 | 0.079306 +/- 0.002754 | 0.031695 +/- 0.002202 | 0.002477 | 0.089916 | 0.000000 |
+| bce-neg5-tail | 3 | 0.080191 +/- 0.000434 | 0.028890 +/- 0.000724 | 0.004274 | 0.090929 | 0.000000 |
+| bpr-neg5-tail | 3 | 0.078244 +/- 0.004988 | 0.031950 +/- 0.003377 | 0.003120 | 0.088720 | 0.000000 |

@@ -28,11 +28,13 @@ experiment server and are not redistributed.
 
 | Task | Verified result |
 | --- | --- |
-| LastFM two-tower ablation | 92,826 interactions; best Recall@20 `0.085987` with BCE, 5 negatives, and tail weighting; rare-artist Tail Recall@20 remained `0` |
-| MovieLens unified retrieval | 10 epochs per learned model; SASRec was best at Recall@20 `0.074197`, ahead of Two-Tower `0.070541` |
-| Criteo full-data CVR | 15,995,634 rows; DeepFM test LogLoss/PR-AUC/AUC `0.035910 / 0.977485 / 0.995453` |
+| LastFM two-tower ablation | 92,824 interactions; BPR with one negative reached Recall@20 `0.081076 +/- 0.003935`; Tail Recall@20 remained `0` |
+| MovieLens unified retrieval | Leakage-free validation selection over three seeds; GRU4Rec Recall@20 `0.090979 +/- 0.002772` |
+| Criteo full-data CVR | 15,995,634 rows; after excluding the audited `product_price` artifact, DeepFM test LogLoss/PR-AUC/AUC `0.274910 / 0.285382 / 0.779100` |
 
 These are offline public-dataset results, not production or online A/B claims.
+The detailed protocol audit and cause analysis are in
+[`evidence/rtx5080-20260920/EXPERIMENT_REPORT_CN.md`](evidence/rtx5080-20260920/EXPERIMENT_REPORT_CN.md).
 
 ## Quick checks
 

@@ -12,7 +12,11 @@
     "NVIDIA GeForce RTX 5080",
     "NVIDIA GeForce RTX 5080"
   ],
-  "git_commit": "eecbbdf11f9a47d4ec8dd4de0974efd84cac3ad4",
+  "code_revisions": {
+    "retrieval_protocol": "3d0e7a8977fe00c0892cc8d90f8343cdcf0df7d7",
+    "cvr_single_feature_diagnostics": "ade0285cd638a9f05326c66293e91ff095d3eb3b",
+    "cvr_clean_protocol": "994f327f6b5ff088bcb371eff52c149f5a650d7d"
+  },
   "datasets": [
     {
       "name": "user_artists.dat",
