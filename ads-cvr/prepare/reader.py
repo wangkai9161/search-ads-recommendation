@@ -385,6 +385,9 @@ FEATURE_SETS = {
     "no_time": (SPARSE_COLUMNS, ("nb_clicks_1week", "product_price")),
     "sparse_only": (SPARSE_COLUMNS, ()),
     "numeric_only": ((), DENSE_COLUMNS),
+    "time_only": ((), ("click_timestamp",)),
+    "click_history_only": ((), ("nb_clicks_1week",)),
+    "price_only": ((), ("product_price",)),
 }
 
 

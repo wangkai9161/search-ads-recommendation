@@ -36,3 +36,9 @@ def test_coarse_context_removes_identity_proxies():
         "partner_id",
         "user_id",
     }.isdisjoint(sparse)
+
+
+def test_single_numeric_feature_sets_are_isolated():
+    assert feature_columns("time_only") == ((), ("click_timestamp",))
+    assert feature_columns("click_history_only") == ((), ("nb_clicks_1week",))
+    assert feature_columns("price_only") == ((), ("product_price",))
